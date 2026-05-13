@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>☕ Learn Java &mdash; kape.dev store</title>
+  <script>(function(){const t=localStorage.getItem('kape-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #000000; --off-black: #0c0c0c; --card: #111111; --card-border: #1e1e1e;
+      --white: #ffffff; --muted: #666666; --muted-light: #888888;
+      --accent: #c8a97e; --accent-dim: rgba(200,169,126,0.1);
+      --lime: #D5E339; --lime-dim: rgba(213,227,57,0.1);
+      --divider: #1e1e1e;
+      --mono: 'Space Mono', monospace; --sans: 'Inter', sans-serif;
+    }
+    [data-theme="light"] {
+      --black: #f4f4f0; --off-black: #eaeae6; --card: #ffffff; --card-border: #e2e2de;
+      --white: #111111; --muted: #999999; --muted-light: #666666;
+      --accent: #a06828; --accent-dim: rgba(160,104,40,0.1);
+      --lime: #8a9800; --lime-dim: rgba(138,152,0,0.08);
+      --divider: #e2e2de;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--black); color: var(--white); overflow-x: hidden; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+
+    /* ─── TICKER ─────────────────────────────── */
+    .ticker-wrap { background: var(--white); overflow: hidden; white-space: nowrap; }
+    .ticker-track { display: inline-flex; animation: ticker-ltr 28s linear infinite; }
+    .ticker-item { font-family: var(--mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; padding: 9px 0; color: var(--black); display: inline-flex; align-items: center; gap: 14px; padding-right: 40px; }
+    .ticker-sep { opacity: 0.25; }
+    .ticker-slash { opacity: 0.35; }
+    @keyframes ticker-ltr { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ─── NAV ─────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.3s;
+    }
+    [data-theme="light"] nav { background: rgba(244,244,240,0.9); border-bottom-color: rgba(0,0,0,0.08); }
+    .nav-logo { font-family: var(--mono); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.12em; color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .nav-logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; display: inline-block; animation: pulse-dot 2.5s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.73rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-light); text-decoration: none; transition: color 0.2s; }
+    .nav-back:hover { color: var(--white); }
+    .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--muted-light); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; transition: all 0.2s; }
+    .theme-toggle:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    [data-theme="light"] .theme-toggle { border-color: rgba(0,0,0,0.15); }
+    [data-theme="light"] .theme-toggle:hover { background: rgba(0,0,0,0.06); }
+
+    /* ─── HERO ────────────────────────────────── */
+    .hero {
+      background: linear-gradient(160deg, #0e1000 0%, #0c0e00 50%, #0a0c00 100%);
+      padding: 80px 24px 60px; position: relative; overflow: hidden;
+    }
+    [data-theme="light"] .hero { background: linear-gradient(160deg, #f8fae8 0%, #f2f6e0 50%, #f0f4dc 100%); }
+    .hero::before { content: ''; position: absolute; width: 800px; height: 800px; background: radial-gradient(circle, rgba(213,227,57,0.12) 0%, transparent 65%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    [data-theme="light"] .hero::before { background: radial-gradient(circle, rgba(213,227,57,0.08) 0%, transparent 65%); }
+    .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(213,227,57,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(213,227,57,0.05) 1px, transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%); }
+    [data-theme="light"] .hero-grid { background-image: linear-gradient(rgba(100,110,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(100,110,0,0.06) 1px, transparent 1px); }
+    .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+    .hero-top { display: flex; align-items: center; gap: 28px; margin-bottom: 32px; }
+    .hero-icon-big { width: 96px; height: 96px; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 48px rgba(213,227,57,0.35); flex-shrink: 0; background: #12151C; padding: 16px; display: flex; align-items: center; justify-content: center; }
+    .hero-icon-big img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .hero-badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .badge { font-family: var(--mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 11px; border-radius: 3px; display: inline-flex; align-items: center; gap: 6px; }
+    .badge-lime { background: rgba(213,227,57,0.12); color: var(--lime); border: 1px solid rgba(213,227,57,0.25); }
+    .badge-amber { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(200,169,126,0.2); }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; letter-spacing: -0.03em; line-height: 1; color: var(--white); }
+    .hero-tagline { font-size: 0.9rem; color: var(--muted-light); margin-top: 6px; }
+    .hero-desc { font-size: 1rem; color: var(--muted-light); line-height: 1.75; max-width: 620px; margin-bottom: 36px; }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 60px; }
+    .btn { font-family: var(--mono); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 14px 28px; border-radius: 4px; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-lime { background: var(--lime); color: #0a0c00; }
+    .btn-lime:hover { background: #e6f542; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(213,227,57,0.35); }
+    .btn-ghost { background: transparent; color: var(--white); border: 1px solid #2a2a2a; }
+    .btn-ghost:hover { border-color: #444; background: rgba(255,255,255,0.04); transform: translateY(-2px); }
+    [data-theme="light"] .btn-ghost { border-color: #ccc; }
+    [data-theme="light"] .btn-ghost:hover { background: rgba(0,0,0,0.04); }
+
+    /* ─── STATS ROW ─────────────────────────── */
+    .stats-row { display: flex; gap: 0; border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; margin-bottom: 48px; }
+    .stat-box { flex: 1; padding: 24px 28px; background: var(--card); text-align: center; border-right: 1px solid var(--card-border); }
+    .stat-box:last-child { border-right: none; }
+    .stat-num { font-family: var(--mono); font-size: 1.9rem; font-weight: 700; color: var(--lime); display: block; }
+    .stat-lbl { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+
+    /* ─── MAIN ────────────────────────────────── */
+    .main { max-width: 900px; margin: 0 auto; padding: 64px 24px 80px; }
+    .slabel { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .slabel::after { content: ''; flex: 1; height: 1px; background: var(--divider); }
+
+    /* ─── BROWSER FRAME ─────────────────────── */
+    .browser-frame { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.5); margin-bottom: 48px; }
+    [data-theme="light"] .browser-frame { box-shadow: 0 24px 64px rgba(0,0,0,0.1); }
+    .browser-bar { background: #1a1a1a; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #2a2a2a; }
+    [data-theme="light"] .browser-bar { background: #f0f0f0; border-bottom-color: #e0e0e0; }
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dots span { width: 12px; height: 12px; border-radius: 50%; }
+    .browser-dots span:nth-child(1) { background: #ff5f57; }
+    .browser-dots span:nth-child(2) { background: #febc2e; }
+    .browser-dots span:nth-child(3) { background: #28c840; }
+    .browser-url { flex: 1; background: #2a2a2a; border-radius: 6px; padding: 6px 14px; font-family: var(--mono); font-size: 0.72rem; color: var(--muted-light); display: flex; align-items: center; gap: 8px; }
+    [data-theme="light"] .browser-url { background: #e4e4e4; color: #555; }
+    .browser-url i { color: var(--lime); font-size: 0.7rem; }
+    .browser-open { font-family: var(--mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lime); text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(213,227,57,0.3); border-radius: 6px; transition: all 0.2s; white-space: nowrap; }
+    .browser-open:hover { background: rgba(213,227,57,0.1); }
+    .browser-iframe-wrap { position: relative; width: 100%; height: 560px; }
+    .browser-iframe-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+    .iframe-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, var(--card), transparent); pointer-events: none; }
+
+    /* ─── TOPICS GRID ───────────────────────── */
+    .topics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 48px; }
+    .topic-chip { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; color: var(--muted-light); transition: all 0.2s; }
+    .topic-chip:hover { border-color: rgba(213,227,57,0.3); color: var(--lime); background: rgba(213,227,57,0.04); }
+    .topic-num { font-size: 0.62rem; color: var(--lime); opacity: 0.7; min-width: 22px; }
+
+    /* ─── FEATURES ──────────────────────────── */
+    .features-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 32px; margin-bottom: 48px; }
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .feature-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--divider); transition: border-color 0.2s; }
+    [data-theme="light"] .feature-item { background: rgba(0,0,0,0.01); }
+    .feature-item:hover { border-color: rgba(213,227,57,0.3); }
+    .feature-icon { width: 38px; height: 38px; background: var(--lime-dim); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: var(--lime); font-size: 0.85rem; flex-shrink: 0; }
+    .feature-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 3px; }
+    .feature-desc { font-size: 0.77rem; color: var(--muted); line-height: 1.5; }
+
+    /* ─── CTA CARD ──────────────────────────── */
+    .cta-card { background: linear-gradient(135deg, rgba(213,227,57,0.08) 0%, rgba(213,227,57,0.04) 100%); border: 1px solid rgba(213,227,57,0.2); border-radius: 16px; padding: 40px; text-align: center; margin-bottom: 48px; }
+    .cta-card h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    .cta-card p { font-size: 0.9rem; color: var(--muted-light); line-height: 1.7; margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-lg { font-family: var(--mono); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 16px 36px; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .btn-lg-lime { background: var(--lime); color: #0a0c00; }
+    .btn-lg-lime:hover { background: #e6f542; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(213,227,57,0.35); }
+    .btn-lg-ghost { background: transparent; color: var(--white); border: 1px solid var(--card-border); }
+    .btn-lg-ghost:hover { border-color: rgba(213,227,57,0.4); background: rgba(213,227,57,0.05); }
+
+    /* ─── ABOUT APP ─────────────────────────── */
+    .about-app { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; display: flex; align-items: center; gap: 20px; }
+    .about-app-icon { width: 52px; height: 52px; border-radius: 13px; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 16px rgba(213,227,57,0.25); background: #12151C; padding: 8px; display: flex; align-items: center; justify-content: center; }
+    .about-app-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .about-app-text h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .about-app-text p { font-size: 0.82rem; color: var(--muted-light); line-height: 1.6; }
+    .about-app-text a { color: var(--lime); text-decoration: none; }
+    .about-app-text a:hover { text-decoration: underline; }
+
+    /* ─── FOOTER ─────────────────────────────── */
+    footer { background: var(--black); border-top: 1px solid var(--divider); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { font-family: var(--mono); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.12em; color: var(--white); display: flex; align-items: center; gap: 8px; }
+    .footer-right { font-size: 0.78rem; color: var(--muted); }
+
+    /* ─── MOBILE ─────────────────────────────── */
+    @media (max-width: 700px) {
+      nav { padding: 16px 20px; }
+      .hero { padding: 70px 20px 40px; }
+      .hero-top { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .topics-grid { grid-template-columns: 1fr 1fr; }
+      .stats-row { flex-direction: column; }
+      .stat-box { border-right: none; border-bottom: 1px solid var(--card-border); }
+      .stat-box:last-child { border-bottom: none; }
+      .browser-iframe-wrap { height: 400px; }
+      .about-app { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span> KAPE.DEV</a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Store</a>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><i id="themeIcon" class="fas fa-sun"></i></button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div class="hero-icon-big"><img src="assets/learnjava/logo.png" alt="Learn Java Logo"></div>
+        <div>
+          <div class="hero-badge-row">
+            <span class="badge badge-lime"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span> Live</span>
+            <span class="badge badge-lime"><i class="fas fa-globe"></i> Web</span>
+            <span class="badge badge-amber"><i class="fas fa-star"></i> Free</span>
+          </div>
+          <h1>☕ Learn Java</h1>
+          <div class="hero-tagline">Interactive Java learning &mdash; code, challenge, and grow in your browser</div>
+        </div>
+      </div>
+      <p class="hero-desc">
+        Learn Java is a web-based platform for mastering Java programming through hands-on topics, live code examples, and interactive challenges. No IDE needed &mdash; write, run, and test Java directly in your browser. Built for students who learn by doing.
+      </p>
+      <div class="hero-actions">
+        <a href="https://code-n-learn-java.vercel.app/" target="_blank" class="btn btn-lime"><i class="fas fa-code"></i> Open App</a>
+        <a href="#topics" class="btn btn-ghost"><i class="fas fa-list"></i> View Topics</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-num">9</span>
+        <div class="stat-lbl">Topics</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">45+</span>
+        <div class="stat-lbl">Code Examples</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num">40+</span>
+        <div class="stat-lbl">Challenges</div>
+      </div>
+    </div>
+
+    <!-- LIVE PREVIEW (BROWSER FRAME) -->
+    <div class="slabel"><i class="fas fa-desktop"></i> Live Preview</div>
+    <div class="browser-frame">
+      <div class="browser-bar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-url"><i class="fas fa-lock"></i> code-n-learn-java.vercel.app</div>
+        <a href="https://code-n-learn-java.vercel.app/" target="_blank" class="browser-open">Open <i class="fas fa-arrow-up-right"></i></a>
+      </div>
+      <div class="browser-iframe-wrap">
+        <iframe
+          src="https://code-n-learn-java.vercel.app/"
+          title="Learn Java Interactive Platform"
+          loading="lazy">
+        </iframe>
+        <div class="iframe-overlay"></div>
+      </div>
+    </div>
+
+    <!-- TOPICS -->
+    <div id="topics" class="slabel"><i class="fas fa-book-open"></i> Topics Covered</div>
+    <div class="topics-grid">
+      <div class="topic-chip"><span class="topic-num">01</span> Loop Structures</div>
+      <div class="topic-chip"><span class="topic-num">02</span> For-Each Loop</div>
+      <div class="topic-chip"><span class="topic-num">03</span> Recursion</div>
+      <div class="topic-chip"><span class="topic-num">04</span> Math Class</div>
+      <div class="topic-chip"><span class="topic-num">05</span> Local Date/Time</div>
+      <div class="topic-chip"><span class="topic-num">06</span> StringBuilder</div>
+      <div class="topic-chip"><span class="topic-num">07</span> 2D Arrays</div>
+      <div class="topic-chip"><span class="topic-num">08</span> ArrayList</div>
+      <div class="topic-chip"><span class="topic-num">09</span> OOP Basics</div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="slabel" style="margin-top:8px;"><i class="fas fa-sparkles"></i> Features</div>
+    <div class="features-card">
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-play"></i></div>
+          <div>
+            <div class="feature-name">Interactive Code Runner</div>
+            <div class="feature-desc">Write and execute Java code directly in the browser &mdash; no IDE or setup required.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+          <div>
+            <div class="feature-name">40+ Challenges</div>
+            <div class="feature-desc">Hands-on exercises with solution walkthroughs to reinforce every topic you study.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-code"></i></div>
+          <div>
+            <div class="feature-name">Syntax Highlighting</div>
+            <div class="feature-desc">Clean, readable Java code examples with proper syntax coloring throughout.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+          <div>
+            <div class="feature-name">Progress Tracking</div>
+            <div class="feature-desc">Log in and track your challenge submissions across sessions, powered by Supabase.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+          <div>
+            <div class="feature-name">Daily Java Tips</div>
+            <div class="feature-desc">Bite-sized Java concepts and tricks delivered each day to sharpen your skills.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-pen"></i></div>
+          <div>
+            <div class="feature-name">Personal Notes</div>
+            <div class="feature-desc">Save your own notes while studying, tied to your account via Supabase auth.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fab fa-discord"></i></div>
+          <div>
+            <div class="feature-name">Discord Integration</div>
+            <div class="feature-desc">Submissions and activity are piped to the team Discord via webhooks for community tracking.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+          <div>
+            <div class="feature-name">Admin Panel</div>
+            <div class="feature-desc">Manage topics, challenges, and user submissions with a built-in admin dashboard.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-card">
+      <h3>Ready to level up your Java?</h3>
+      <p>☕ Learn Java runs entirely in your browser &mdash; just open the link and start coding. No installation, no fees.</p>
+      <div class="cta-btns">
+        <a href="https://code-n-learn-java.vercel.app/" target="_blank" class="btn-lg btn-lg-lime"><i class="fas fa-code"></i> Open Learn Java</a>
+        <a href="index.html" class="btn-lg btn-lg-ghost"><i class="fas fa-th-large"></i> More Apps</a>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="slabel"><i class="fas fa-info-circle"></i> About</div>
+    <div class="about-app">
+      <div class="about-app-icon"><img src="assets/learnjava/logo.png" alt="Learn Java"></div>
+      <div class="about-app-text">
+        <h3>Built by <a href="index.html">kape.dev</a></h3>
+        <p>☕ Learn Java is a free, browser-based Java learning platform covering 9 core topics with 45+ code examples and 40+ hands-on challenges. Designed for students who learn by doing. <a href="https://code-n-learn-java.vercel.app/" target="_blank">Open the app &rarr;</a></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+      <span class="ticker-item">KAPE.DEV <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">LEARN JAVA <span class="ticker-sep">;</span></span>
+      <span class="ticker-item">☕</span>
+      <span class="ticker-item"><span class="ticker-slash">///////////////////</span></span>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><span>☕</span> KAPE.DEV</div>
+    <div class="footer-right">&copy; 2026 kape.dev &mdash; ☕ Learn Java</div>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('kape-theme', next);
+      updateIcon();
+    }
+    function updateIcon() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const icon = document.getElementById('themeIcon');
+      if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    document.addEventListener('DOMContentLoaded', updateIcon);
+  </script>
+</body>
+</html>

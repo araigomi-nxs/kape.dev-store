@@ -19,7 +19,13 @@
       "Bash(npm install *)",
       "Bash(vercel --yes)",
       "Bash(vercel login *)",
-      "Bash(vercel --yes --name kape-dev-store)"
+      "Bash(vercel --yes --name kape-dev-store)",
+      "Bash(curl -L \"https://code-n-learn-java.vercel.app/logo/usericon1.png\" -o \"c:\\\\Users\\\\limaj\\\\Downloads\\\\kape.dev store\\\\assets\\\\learnjava\\\\logo.png\" --silent --write-out \"%{http_code} %{size_download}bytes\")",
+      "Bash(npx vercel *)",
+      "Bash(node -e \"require\\('qrcode'\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s \"https://api.github.com/users/araigomi-nxs\")",
+      "Bash(curl -s \"https://api.github.com/users/JOhn3xp1e\")"
     ]
   }
 }

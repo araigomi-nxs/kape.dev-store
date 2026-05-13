@@ -123,6 +123,23 @@
     .dl-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
     .dl-title { font-size: 1rem; font-weight: 700; }
     .dl-sub { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .qr-frame { position: relative; display: inline-flex; }
+    .qr-frame img { width: 200px; height: 200px; border-radius: 14px; display: block; border: 3px solid #1e1e1e; }
+    [data-theme="light"] .qr-frame img { border-color: #e2e2de; }
+    .qr-logo {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 48px; height: 48px;
+      background: #fff;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+      border: 2px solid #2a2a2a;
+      padding: 5px;
+    }
+    [data-theme="light"] .qr-logo { border-color: #e2e2de; }
+    .qr-logo img { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 6px; }
+    .qr-hint { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; text-align: center; display: flex; align-items: center; gap: 6px; }
     .android-pill { display: flex; align-items: center; gap: 8px; background: rgba(61,220,132,0.08); border: 1px solid rgba(61,220,132,0.18); color: #3ddc84; font-family: var(--mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; padding: 8px 14px; border-radius: 6px; }
     .dl-btn { display: flex; align-items: center; gap: 14px; padding: 15px 20px; border-radius: 10px; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; width: 100%; font-family: var(--sans); background: var(--teal); color: #000; }
     .dl-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,188,188,0.3); filter: brightness(1.08); }
@@ -240,12 +257,11 @@
           <div class="hero-badge-row">
             <span class="badge badge-teal"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span> Live</span>
             <span class="badge badge-green"><i class="fab fa-android"></i> Android</span>
-            <span class="badge badge-green"><i class="fab fa-apple"></i> iOS</span>
             <span class="badge badge-teal"><i class="fas fa-globe"></i> Web</span>
             <span class="badge badge-amber"><i class="fas fa-download"></i> Free</span>
           </div>
           <h1>E-Suyo</h1>
-          <div class="hero-tagline">Your guide to commuting in Albay &mdash; mobile app &amp; interactive web map</div>
+          <div class="hero-tagline">Your guide to commuting in Albay &mdash; Android app &amp; interactive web map</div>
         </div>
       </div>
       <p class="hero-desc">
@@ -283,10 +299,17 @@
     <!-- DOWNLOAD -->
     <div class="slabel"><i class="fas fa-download"></i> Download</div>
     <div class="dl-grid">
-      <div class="dl-card">
+      <div class="dl-card" style="align-items:center;text-align:center;">
         <div class="dl-title">Mobile App</div>
-        <p class="dl-sub">Download the Android APK directly from our GitHub releases. iOS coming soon.</p>
+        <p class="dl-sub">Download the Android APK directly from our GitHub releases.</p>
         <div class="android-pill"><i class="fab fa-android"></i> Android &middot; v1.2.0 &middot; Latest Release</div>
+        <div class="qr-wrap">
+          <div class="qr-frame">
+            <img src="assets/esuyo/qr-apk.png" alt="QR code — E-Suyo APK download">
+            <div class="qr-logo"><img src="assets/esuyo/logo.png" alt="E-Suyo"></div>
+          </div>
+          <div class="qr-hint"><i class="fas fa-camera"></i> Scan to download APK</div>
+        </div>
         <a href="https://github.com/araigomi-nxs/esuyo-mobile/releases/download/v1.2.0/app-release.apk" target="_blank" class="dl-btn">
           <i class="fab fa-android" style="font-size:1.6rem;flex-shrink:0;"></i>
           <div><small>DOWNLOAD APK</small><strong>v1.2.0 &mdash; Latest</strong></div>
@@ -297,14 +320,26 @@
           <div><small>ALL RELEASES ON</small><strong>GitHub</strong></div>
         </a>
       </div>
-      <div class="dl-card" style="align-items:center;justify-content:center;text-align:center;gap:16px;">
-        <div style="font-size:0.95rem;font-weight:700;">Interactive Web Map</div>
-        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">No download needed &mdash; runs entirely in your browser.</p>
-        <a href="https://esuyo-web.vercel.app/" target="_blank" class="dl-btn" style="background:var(--teal);justify-content:center;">
-          <i class="fas fa-map-location-dot" style="font-size:1.4rem;flex-shrink:0;"></i>
+      <div class="dl-card" style="align-items:center;text-align:center;">
+        <div class="dl-title">Interactive Web Map</div>
+        <p class="dl-sub">No download needed &mdash; runs entirely in your browser.</p>
+        <div class="android-pill" style="background:rgba(0,188,188,0.08);border-color:rgba(0,188,188,0.18);color:var(--teal);"><i class="fas fa-globe"></i> Web &middot; No install required</div>
+        <div class="qr-wrap">
+          <div class="qr-frame">
+            <img src="assets/esuyo/qr-web.png" alt="QR code — E-Suyo web map">
+            <div class="qr-logo"><img src="assets/esuyo/logo.png" alt="E-Suyo"></div>
+          </div>
+          <div class="qr-hint"><i class="fas fa-camera"></i> Scan to open web map</div>
+        </div>
+        <a href="https://esuyo-web.vercel.app/" target="_blank" class="dl-btn">
+          <i class="fas fa-map-location-dot" style="font-size:1.6rem;flex-shrink:0;"></i>
           <div><small>OPEN IN BROWSER</small><strong>esuyo-web.vercel.app</strong></div>
         </a>
-        <div style="font-family:var(--mono);font-size:0.68rem;color:var(--muted);letter-spacing:0.08em;">// prototype &middot; Albay area only</div>
+        <div class="divider-or">or</div>
+        <a href="https://esuyo-web.vercel.app/" target="_blank" class="dl-btn dark">
+          <i class="fas fa-arrow-up-right" style="font-size:1.4rem;flex-shrink:0;"></i>
+          <div><small>PROTOTYPE</small><strong>Albay area only</strong></div>
+        </a>
       </div>
     </div>
 
@@ -403,7 +438,7 @@
       <div class="about-app-icon"><img src="assets/esuyo/logo.png" alt="E-Suyo"></div>
       <div class="about-app-text">
         <h3>Built by <a href="index.html">kape.dev</a></h3>
-        <p>E-Suyo is available as both a mobile app (Android &amp; iOS) and an interactive web map. Currently in prototype phase supporting the Albay area &mdash; built to solve real commuting problems in the Philippines. <a href="https://esuyo-web.vercel.app/" target="_blank">Open the web map &rarr;</a></p>
+        <p>E-Suyo is available as an Android app and an interactive web map. Currently in prototype phase supporting the Albay area &mdash; built to solve real commuting problems in the Philippines. <a href="https://esuyo-web.vercel.app/" target="_blank">Open the web map &rarr;</a></p>
       </div>
     </div>
 
