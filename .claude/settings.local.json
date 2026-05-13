@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx serve *)",
+      "PowerShell(Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and $_.IPAddress -notmatch '^169' } | Select-Object InterfaceAlias, IPAddress | Format-Table -AutoSize)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue | Select-Object OwningProcess | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; Write-Host \"Cleared port 3000\")",
+      "Bash(node server.js)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue)",
+      "PowerShell(netsh advfirewall firewall show rule name=\"kape.dev Node Server\" 2>$null)",
+      "PowerShell(netsh advfirewall firewall show rule name=\"Node.js\" 2>$null)",
+      "PowerShell(New-NetFirewallRule -DisplayName \"kape.dev Store \\(Port 3000\\)\" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow -Profile Any)",
+      "WebFetch(domain:esuyo-web.vercel.app)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\limaj\\\\Downloads\\\\kape.dev store\\\\assets\\\\esuyo\")",
+      "WebFetch(domain:github.com)",
+      "Bash(gh release *)",
+      "Bash(curl -s \"https://api.github.com/repos/araigomi-nxs/esuyo-mobile/releases\")",
+      "Bash(python3 -c \"import json,sys; releases=json.load\\(sys.stdin\\); [print\\(r['tag_name'], r['name'], '\\\\n'.join\\([a['browser_download_url'] for a in r['assets']]\\)\\) for r in releases]\")",
+      "Bash(vercel --version)",
+      "Bash(npm install *)",
+      "Bash(vercel --yes)",
+      "Bash(vercel login *)",
+      "Bash(vercel --yes --name kape-dev-store)"
+    ]
+  }
+}
