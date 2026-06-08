@@ -1,5 +1,5 @@
 .vercel
-.supabaseconfig.js
+.supabase-config.js
 .add-content-column.sql
 .commissions.sql
 .schema.sql
