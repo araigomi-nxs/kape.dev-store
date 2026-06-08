@@ -367,6 +367,7 @@
             <div class="item-meta">${esc(p.category||'—')} · ${esc(p.status||'')}</div>
           </div>
           <div class="item-actions">
+            <button class="icon-btn" title="${p.featured?'Unfeature':'Feature on homepage'}" onclick='toggleFeatured(${JSON.stringify(p.id)}, ${p.featured?'true':'false'})' style="${p.featured?'color:var(--accent);border-color:var(--accent);':''}"><i class="fas fa-star"></i></button>
             <button class="icon-btn" title="Edit" onclick='editItem(${JSON.stringify(p.id)})'><i class="fas fa-pen"></i></button>
             <button class="icon-btn" title="Delete" onclick='delItem(${JSON.stringify(p.id)}, ${JSON.stringify(p.title)})'><i class="fas fa-trash"></i></button>
           </div>
@@ -417,6 +418,12 @@
       pb.href='https://kape-dev.vercel.app/post.html?id='+encodeURIComponent(id);
       pb.style.display='inline-flex';
     }
+
+    window.toggleFeatured = async (id, isFeatured) => {
+      const { error } = await sb.from('projects').update({ featured: !isFeatured }).eq('id', id);
+      if(error){ alert(error.message); return; }
+      loadList();
+    };
 
     window.delItem = async (id,title) => {
       if(!confirm(`Delete "${title}"? This cannot be undone.`)) return;
