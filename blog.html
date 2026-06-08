@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects &amp; Blog — kape.dev</title>
+  <script>(function(){const t=localStorage.getItem('kape-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #000000; --off-black: #0c0c0c; --card: #111111; --card-border: #1e1e1e;
+      --white: #ffffff; --muted: #666666; --muted-light: #888888;
+      --accent: #c8a97e; --accent-dim: rgba(200,169,126,0.1); --accent-glow: rgba(200,169,126,0.25);
+      --green: #00c97a; --divider: #1e1e1e;
+      --mono: 'Space Mono', monospace; --sans: 'Inter', sans-serif;
+    }
+    [data-theme="light"] {
+      --black: #f4f4f0; --off-black: #eaeae6; --card: #ffffff; --card-border: #e2e2de;
+      --white: #111111; --muted: #999999; --muted-light: #666666;
+      --accent: #a06828; --accent-dim: rgba(160,104,40,0.1); --accent-glow: rgba(160,104,40,0.2);
+      --divider: #e2e2de;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--black); color: var(--white); overflow-x: hidden; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; min-height: 100vh; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 48px; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.3s, border-color 0.3s;
+    }
+    [data-theme="light"] nav { background: rgba(244,244,240,0.9); border-bottom-color: rgba(0,0,0,0.08); }
+    .nav-logo { font-family: var(--mono); font-size: 0.95rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .nav-logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; display: inline-block; animation: pulse-dot 2.5s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--muted-light); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--muted-light); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; transition: all 0.2s; flex-shrink: 0; }
+    .theme-toggle:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    [data-theme="light"] .theme-toggle { border-color: rgba(0,0,0,0.15); }
+
+    .page-head { padding: 160px 24px 40px; max-width: 1100px; margin: 0 auto; position: relative; }
+    .page-head .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 70% 80% at 30% 30%, black 10%, transparent 90%); pointer-events: none; }
+    [data-theme="light"] .page-head .grid-bg { background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); }
+    .section-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; position: relative; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--divider); max-width: 80px; }
+    .page-title { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; position: relative; }
+    .page-title .accent-word { color: var(--accent); }
+    .page-sub { font-size: 1.05rem; color: var(--muted-light); line-height: 1.7; max-width: 540px; margin-top: 16px; position: relative; }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 24px 100px; }
+    .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .app-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; text-align: left; color: var(--white); text-decoration: none; display: flex; flex-direction: column; gap: 16px; transition: all 0.25s; position: relative; overflow: hidden; cursor: pointer; width: 100%; font-family: inherit; }
+    .app-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 100%); opacity: 0; transition: opacity 0.25s; }
+    .app-card:hover { border-color: #2a2a2a; transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    [data-theme="light"] .app-card:hover { border-color: #ccc; box-shadow: 0 20px 60px rgba(0,0,0,0.1); }
+    .app-card:hover::before { opacity: 1; }
+    .app-card-cover { width: calc(100% + 56px); height: 150px; margin: -28px -28px 4px; object-fit: cover; display: block; background: var(--off-black); }
+    .app-card-header { display: flex; align-items: center; gap: 14px; }
+    .app-card-icon { width: 52px; height: 52px; border-radius: 13px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: var(--off-black); }
+    .app-card-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .app-card-name { font-size: 1rem; font-weight: 700; }
+    .app-card-cat { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 2px; }
+    .app-card-desc { font-size: 0.85rem; color: var(--muted-light); line-height: 1.65; flex: 1; }
+    .app-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { font-family: var(--mono); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; padding: 4px 11px; border-radius: 3px; border: 1px solid #2a2a2a; color: var(--muted-light); }
+    [data-theme="light"] .tag { border-color: #ddd; }
+    .tag.amber { border-color: rgba(200,169,126,0.3); color: var(--accent); background: var(--accent-dim); }
+    .app-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #1a1a1a; margin-top: auto; }
+    [data-theme="light"] .app-card-footer { border-top-color: #eee; }
+    .app-card-status { font-family: var(--mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 3px; display: flex; align-items: center; gap: 5px; background: rgba(0,201,122,0.12); color: var(--green); border: 1px solid rgba(0,201,122,0.2); }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .app-card-arrow { color: var(--muted); font-size: 0.85rem; transition: transform 0.2s, color 0.2s; }
+    .app-card:hover .app-card-arrow { transform: translate(3px, -3px); color: var(--white); }
+    .app-card-date { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); letter-spacing: 0.06em; }
+
+    .state { text-align: center; padding: 80px 24px; color: var(--muted-light); font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.05em; }
+    .state i { font-size: 1.6rem; color: var(--accent); margin-bottom: 14px; display: block; }
+    .spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* detail modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 80px 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--card-border); border-radius: 20px; max-width: 720px; width: 100%; overflow: hidden; position: relative; }
+    .modal-cover { width: 100%; height: 240px; object-fit: cover; display: block; background: var(--off-black); }
+    .modal-body { padding: 36px 40px 44px; }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; border-radius: 10px; border: none; background: rgba(0,0,0,0.5); color: #fff; cursor: pointer; font-size: 1rem; z-index: 2; }
+    .modal-close:hover { background: var(--accent); color: #000; }
+    .modal h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .modal .modal-cat { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+    .modal .modal-text { font-size: 0.95rem; color: var(--muted-light); line-height: 1.8; white-space: pre-wrap; margin: 20px 0; }
+    .modal .btn { font-family: var(--mono); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; padding: 13px 28px; border-radius: 4px; background: var(--white); color: var(--black); display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .modal .btn:hover { background: var(--accent); }
+
+    footer { border-top: 1px solid var(--divider); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.05em; }
+    footer a { color: var(--muted-light); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; } .nav-links { gap: 16px; }
+      .page-head { padding: 130px 20px 30px; } .modal-body { padding: 28px 24px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span> KAPE.DEV</a>
+    <div class="nav-links">
+      <a href="index.html#apps">Apps</a>
+      <a href="blog.html" class="active">Blog</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><i id="themeIcon" class="fas fa-sun"></i></button>
+    </div>
+  </nav>
+
+  <header class="page-head">
+    <div class="grid-bg"></div>
+    <div class="section-label"><i class="fas fa-layer-group"></i> Project Repo</div>
+    <h1 class="page-title">Projects &amp; <span class="accent-word">Blog.</span></h1>
+    <p class="page-sub">Everything the kape.dev crew is building &mdash; POS systems, portfolios, and small-scale systems. Updated live from our workshop.</p>
+  </header>
+
+  <main class="wrap">
+    <div id="grid" class="apps-grid"></div>
+    <div id="state" class="state"><i class="fas fa-circle-notch spin"></i> Loading projects…</div>
+  </main>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      <img class="modal-cover" id="m-cover" alt="" style="display:none;">
+      <div class="modal-body">
+        <div class="modal-cat" id="m-cat"></div>
+        <h2 id="m-title"></h2>
+        <div class="app-tags" id="m-tags" style="margin-bottom:6px;"></div>
+        <div class="modal-text" id="m-body"></div>
+        <a class="btn" id="m-link" target="_blank" rel="noopener" style="display:none;"><i class="fas fa-arrow-up-right-from-square"></i> Visit</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© <span id="yr"></span> kape.dev — brewed with ☕ &amp; code</span>
+    <a href="https://admin.kape.dev" target="_blank" rel="noopener">Admin →</a>
+  </footer>
+
+  <script>
+    function toggleTheme(){const r=document.documentElement;const n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);localStorage.setItem('kape-theme',n);syncIcon();}
+    function syncIcon(){const d=document.documentElement.getAttribute('data-theme')==='dark';const i=document.getElementById('themeIcon');if(i)i.className=d?'fas fa-sun':'fas fa-moon';}
+    syncIcon();
+    document.getElementById('yr').textContent=new Date().getFullYear();
+  </script>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    let POSTS = [];
+    const esc = s => (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const fmtDate = d => new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+
+    function cardHTML(p, i){
+      const cover = p.cover_url ? `<img class="app-card-cover" src="${esc(p.cover_url)}" alt="">` : '';
+      const icon = p.icon_url ? `<div class="app-card-icon"><img src="${esc(p.icon_url)}" alt=""></div>`
+                              : `<div class="app-card-icon">${p.title ? esc(p.title.trim()[0]||'•') : '•'}</div>`;
+      const tags = (p.tags||[]).slice(0,3).map(t=>`<span class="tag amber">${esc(t)}</span>`).join('');
+      return `<a class="app-card" href="post.html?id=${encodeURIComponent(p.id)}">
+        ${cover}
+        <div class="app-card-header">
+          ${icon}
+          <div>
+            <div class="app-card-name">${esc(p.title)}</div>
+            <div class="app-card-cat">${esc(p.category||'Project')}</div>
+          </div>
+        </div>
+        ${p.description ? `<p class="app-card-desc">${esc(p.description)}</p>` : ''}
+        ${tags ? `<div class="app-tags">${tags}</div>` : ''}
+        <div class="app-card-footer">
+          <span class="app-card-status"><span class="status-dot"></span> ${esc(p.status||'Live')}</span>
+          <span class="app-card-date">${fmtDate(p.created_at)}</span>
+        </div>
+      </a>`;
+    }
+
+    function openModal(i){
+      const p = POSTS[i]; if(!p) return;
+      const cov = document.getElementById('m-cover');
+      if(p.cover_url){ cov.src = p.cover_url; cov.style.display='block'; } else { cov.style.display='none'; }
+      document.getElementById('m-cat').textContent = (p.category||'Project') + ' · ' + (p.status||'Live');
+      document.getElementById('m-title').textContent = p.title;
+      document.getElementById('m-tags').innerHTML = (p.tags||[]).map(t=>`<span class="tag amber">${esc(t)}</span>`).join('');
+      document.getElementById('m-body').textContent = p.body || p.description || '';
+      const link = document.getElementById('m-link');
+      if(p.link_url){ link.href = p.link_url; link.style.display='inline-flex'; } else { link.style.display='none'; }
+      document.getElementById('modal').classList.add('open');
+      document.body.style.overflow='hidden';
+    }
+    function closeModal(){ document.getElementById('modal').classList.remove('open'); document.body.style.overflow=''; }
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+    async function load(){
+      const state = document.getElementById('state');
+      if(!window.SUPABASE_URL || window.SUPABASE_URL.includes('YOUR-PROJECT')){
+        state.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Add your Supabase URL + anon key in <b>supabase-config.js</b>.';
+        return;
+      }
+      const { data, error } = await sb.from('projects')
+        .select('*').eq('published', true)
+        .order('featured', { ascending:false })
+        .order('sort_order', { ascending:false })
+        .order('created_at', { ascending:false });
+      if(error){ state.innerHTML = '<i class="fas fa-triangle-exclamation"></i> '+esc(error.message); return; }
+      POSTS = data || [];
+      if(!POSTS.length){ state.innerHTML = '<i class="fas fa-inbox"></i> No projects published yet.'; return; }
+      state.style.display='none';
+      document.getElementById('grid').innerHTML = POSTS.map(cardHTML).join('');
+    }
+    load();
+  </script>
+</body>
+</html>

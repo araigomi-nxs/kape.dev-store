@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" http://localhost:3000/post.html)",
+      "Bash(curl -s http://localhost:3000/post.html)",
+      "Bash(curl -s http://localhost:3000/index.html)",
+      "Bash(curl -s http://localhost:3000/kape-admin/index.html)",
+      "Bash(node -e ' *)",
+      "PowerShell(\"node stopped\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://kape-dev.vercel.app/post.html)",
+      "Bash(curl -s https://kape-dev.vercel.app/blog.html)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://admin.kape.dev/)",
+      "Bash(curl -s https://admin.kape.dev/)",
+      "Bash(curl -sL --max-time 20 -o /dev/null -w \"%{http_code}\\\\n\" https://admin.kape.dev/)",
+      "Bash(curl -sL --max-time 20 -o /dev/null -w \"%{http_code}\\\\n\" https://kape-admin-2uqf8aelm-araigomi-nxs-projects.vercel.app/)",
+      "Bash(curl -sL --max-time 20 https://kape-admin-2uqf8aelm-araigomi-nxs-projects.vercel.app/)"
+    ]
+  }
+}

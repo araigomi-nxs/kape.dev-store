@@ -10,6 +10,8 @@ const mime = {
   '.html': 'text/html',
   '.css':  'text/css',
   '.js':   'text/javascript',
+  '.jsx':  'text/babel',
+  '.json': 'application/json',
   '.png':  'image/png',
   '.jpg':  'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -22,7 +24,7 @@ const mime = {
 
 http.createServer((req, res) => {
   let urlPath = req.url.split('?')[0];
-  if (urlPath === '/') urlPath = '/index.html';
+  if (urlPath.endsWith('/')) urlPath += 'index.html';
   const filePath = path.join(ROOT, urlPath);
 
   fs.readFile(filePath, (err, data) => {

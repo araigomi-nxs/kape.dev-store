@@ -102,6 +102,24 @@
     .hero-stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
     .hero-stat-div { width: 1px; background: var(--divider); align-self: stretch; }
 
+    /* ─── HERO SPLIT (text + contact widget) ─── */
+    .hero-split { display: flex; align-items: center; justify-content: center; gap: 64px; max-width: 1100px; width: 100%; position: relative; z-index: 2; flex-wrap: wrap; }
+    .hero-content { flex: 1 1 420px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+    .hero-content .hero-eyebrow { justify-content: flex-start; }
+    .hero-content .hero-eyebrow::before { display: none; }
+    .hero-content .hero-sub { margin-left: 0; margin-right: 0; }
+    .hero-content .hero-actions { justify-content: flex-start; }
+    .hero-content .hero-stats { justify-content: flex-start; }
+    .hero-services { margin-top: 28px; margin-bottom: 0; }
+    .hero-contact { flex: 0 1 380px; min-width: 300px; text-align: left; }
+    .hero-contact .contact-box { margin-top: 18px; }
+    @media (max-width: 880px) {
+      .hero-split { gap: 40px; }
+      .hero-content, .hero-contact { flex-basis: 100%; align-items: center; text-align: center; }
+      .hero-content .hero-eyebrow, .hero-content .hero-actions, .hero-content .hero-stats { justify-content: center; }
+      .hero-content .hero-eyebrow::before { display: block; }
+    }
+
     /* ─── SECTION SHARED ─────────────────────── */
     section { padding: 100px 24px; }
     .container { max-width: 1100px; margin: 0 auto; }
@@ -237,7 +255,7 @@
     .pool-name { font-family: var(--mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted-light); text-align: center; margin-top: 10px; }
 
     /* ─── TEAM ───────────────────────────────── */
-    .team-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px; }
+    .team-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
     .team-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; transition: border-color 0.25s, transform 0.25s; }
     .team-card:hover { border-color: #2a2a2a; transform: translateY(-4px); }
     [data-theme="light"] .team-card:hover { border-color: #ccc; }
@@ -267,6 +285,10 @@
     .contact-link { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.73rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; padding: 12px 22px; border-radius: 6px; border: 1px solid #2a2a2a; color: var(--white); transition: all 0.2s; }
     [data-theme="light"] .contact-link { border-color: #ddd; }
     .contact-link:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .contact-link-accent { background: var(--accent); color: var(--black); border-color: var(--accent); }
+    .contact-link-accent:hover { background: var(--white); color: var(--black); border-color: var(--white); }
+    [data-theme="light"] .contact-link-accent { color: #fff; }
+    [data-theme="light"] .contact-link-accent:hover { color: #111; }
 
     /* ─── COMMUNITY ──────────────────────────── */
     .community-section { background: var(--black); padding: 80px 24px; border-top: 1px solid var(--divider); }
@@ -313,6 +335,7 @@
     <a href="#" class="nav-logo"><span class="nav-logo-dot"></span> KAPE.DEV</a>
     <div class="nav-links">
       <a href="#apps">Apps</a>
+      <a href="blog.html">Blog</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
       <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><i id="themeIcon" class="fas fa-sun"></i></button>
@@ -349,28 +372,41 @@
   <section class="hero">
     <div class="hero-grid-bg"></div>
     <div class="hero-glow"></div>
-    <div class="hero-eyebrow">kape.dev &mdash; it group</div>
-    <h1>We build<br><span class="accent-word">apps.</span></h1>
-    <p class="hero-mono-tag">// fueled by coffee &amp; code</p>
-    <p class="hero-sub">A collective of developers crafting tools for real people. From profit trackers to commute maps &mdash; all brewed right here.</p>
-    <div class="hero-actions">
-      <a href="#apps" class="btn btn-primary"><i class="fas fa-th-large"></i> Browse Apps</a>
-      <a href="#about" class="btn btn-ghost">Who We Are</a>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <span class="hero-stat-num">03</span>
-        <span class="hero-stat-label">Live Apps</span>
+    <div class="hero-split">
+      <div class="hero-content">
+        <div class="hero-eyebrow">kape.dev &mdash; local app builders</div>
+        <h1>We build<br><span class="accent-word">apps.</span></h1>
+        <p class="hero-mono-tag">// fueled by coffee &amp; code</p>
+        <p class="hero-sub">A collective of developers crafting tools for real people. From profit trackers to commute maps &mdash; all brewed right here.</p>
+        <div class="hero-actions">
+          <a href="#apps" class="btn btn-primary"><i class="fas fa-th-large"></i> Browse Apps</a>
+          <a href="#about" class="btn btn-ghost">Who We Are</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-num">03</span>
+            <span class="hero-stat-label">Live Apps</span>
+          </div>
+        </div>
+        <div class="app-tags hero-services">
+          <span class="tag amber"><i class="fas fa-cash-register"></i> POS Systems</span>
+          <span class="tag amber"><i class="fas fa-briefcase"></i> Portfolios</span>
+          <span class="tag amber"><i class="fas fa-cubes"></i> Small-Scale Systems</span>
+        </div>
       </div>
-      <div class="hero-stat-div"></div>
-      <div class="hero-stat">
-        <span class="hero-stat-num">4.9</span>
-        <span class="hero-stat-label">Star Rating</span>
-      </div>
-      <div class="hero-stat-div"></div>
-      <div class="hero-stat">
-        <span class="hero-stat-num">100%</span>
-        <span class="hero-stat-label">Free</span>
+
+      <!-- CONTACT WIDGET -->
+      <div class="hero-contact" id="contact">
+        <div class="section-label">Say Hello</div>
+        <div class="contact-box">
+          <div class="contact-icon"><i class="fas fa-mug-hot"></i></div>
+          <h3>Contact Us</h3>
+          <p>Need system solutions for your business or portfolio? Let's build it together &mdash; reach out and we'll get back to you.</p>
+          <div class="contact-links">
+            <a href="https://www.facebook.com/profile.php?id=61589240081810" target="_blank" rel="noopener" class="contact-link"><i class="fab fa-facebook"></i> Facebook</a>
+            <a href="builder/" class="contact-link contact-link-accent"><i class="fas fa-cash-register"></i> Commission a POS</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -474,7 +510,7 @@
       <div class="section-label"><i class="fas fa-layer-group"></i> All Projects</div>
       <h2 class="section-title">What We've Built</h2>
       <p class="section-sub">From mobile apps to web platforms &mdash; here's what the kape.dev crew has shipped.</p>
-      <div class="apps-grid">
+      <div class="apps-grid" id="appsGrid">
         <a href="penny.html" class="app-card">
           <div class="app-card-header">
             <div class="app-card-icon" style="box-shadow:0 4px 16px rgba(43,59,255,0.3);"><img src="assets/penny/logo.png" alt="Penny"></div>
@@ -528,33 +564,6 @@
     </div>
   </section>
 
-  <!-- TECH STACK -->
-  <div class="stack-section">
-    <div class="stack-label">// tech we use</div>
-    <div style="overflow:hidden;">
-      <div class="stack-track">
-        <span class="stack-item"><i class="fab fa-android" style="color:#3ddc84"></i> Android</span>
-        <span class="stack-item"><i class="fab fa-java" style="color:#f89820"></i> Java</span>
-        <span class="stack-item"><i class="fab fa-python" style="color:#3572A5"></i> Python</span>
-        <span class="stack-item"><i class="fab fa-js" style="color:#f7df1e"></i> JavaScript</span>
-        <span class="stack-item"><i class="fas fa-database" style="color:#00758f"></i> SQLite</span>
-        <span class="stack-item"><i class="fab fa-figma" style="color:#ff7262"></i> Figma</span>
-        <span class="stack-item"><i class="fab fa-github" style="color:#fff"></i> GitHub</span>
-        <span class="stack-item"><i class="fas fa-fire" style="color:#ffca28"></i> Firebase</span>
-        <span class="stack-item"><i class="fas fa-map" style="color:#00bcbc"></i> Leaflet</span>
-        <span class="stack-item"><i class="fab fa-android" style="color:#3ddc84"></i> Android</span>
-        <span class="stack-item"><i class="fab fa-java" style="color:#f89820"></i> Java</span>
-        <span class="stack-item"><i class="fab fa-python" style="color:#3572A5"></i> Python</span>
-        <span class="stack-item"><i class="fab fa-js" style="color:#f7df1e"></i> JavaScript</span>
-        <span class="stack-item"><i class="fas fa-database" style="color:#00758f"></i> SQLite</span>
-        <span class="stack-item"><i class="fab fa-figma" style="color:#ff7262"></i> Figma</span>
-        <span class="stack-item"><i class="fab fa-github" style="color:#fff"></i> GitHub</span>
-        <span class="stack-item"><i class="fas fa-fire" style="color:#ffca28"></i> Firebase</span>
-        <span class="stack-item"><i class="fas fa-map" style="color:#00bcbc"></i> Leaflet</span>
-      </div>
-    </div>
-  </div>
-
   <!-- ABOUT -->
   <section id="about">
     <div class="container">
@@ -562,8 +571,8 @@
       <h2 class="section-title">The kape.dev crew</h2>
       <div class="about-grid">
         <div class="about-text">
-          <p>We're an IT group of student developers who bond over coffee and late-night coding sessions. <strong>Kape</strong> &mdash; Filipino for coffee &mdash; is more than a name. It's how we start every build.</p>
-          <p>We build apps that solve real problems, especially for people in our community. Our goal: ship clean, useful software that anyone can use &mdash; for free.</p>
+          <p>We're a group of local app builders &mdash; student developers who bond over coffee and late-night coding sessions. <strong>Kape</strong> &mdash; Filipino for coffee &mdash; is more than a name. It's how we start every build.</p>
+          <p>We build apps that solve real problems, especially for people in our community. Our goal: ship clean, useful software that anyone can use.</p>
           <p>From concept to APK to interactive web maps, everything we make is built with care, curiosity, and a whole lot of caffeine.</p>
         </div>
         <div class="about-values">
@@ -581,13 +590,6 @@
               <div class="value-desc">Our apps are designed for real people with real problems, right here in our community.</div>
             </div>
           </div>
-          <div class="value-item">
-            <div class="value-icon"><i class="fas fa-lock-open"></i></div>
-            <div>
-              <div class="value-title">Always free</div>
-              <div class="value-desc">We believe great tools shouldn't cost a thing. All our apps are free to download and use.</div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -600,6 +602,10 @@
         <div class="pool-icon" id="orb1">
           <div class="pool-avatar" style="width:52px;height:52px;"><img src="https://avatars.githubusercontent.com/u/196660055?v=4" alt="Mr.codExpie"></div>
           <div class="pool-name">Mr.codExpie</div>
+        </div>
+        <div class="pool-icon" id="orb2">
+          <div class="pool-avatar" style="width:52px;height:52px;"><img src="https://avatars.githubusercontent.com/u/211171340?v=4" alt="Zoid"></div>
+          <div class="pool-name">Zoid</div>
         </div>
       </div>
 
@@ -632,25 +638,18 @@
           </div>
           <a href="https://github.com/JOhn3xp1e" target="_blank" class="team-gh-btn"><i class="fab fa-github"></i> View GitHub</a>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="container">
-      <div class="contact-inner">
-        <div class="section-label">Say Hello</div>
-        <h2 class="section-title">Get in touch</h2>
-        <div class="contact-box">
-          <div class="contact-icon"><i class="fas fa-mug-hot"></i></div>
-          <h3>Let's grab a coffee</h3>
-          <p>Got feedback on our apps? Want to collaborate? Found a bug? Hit us up &mdash; we actually read our messages.</p>
-          <div class="contact-links">
-            <a href="mailto:kape.dev@email.com" class="contact-link"><i class="fas fa-envelope"></i> Email Us</a>
-            <a href="#" class="contact-link"><i class="fab fa-github"></i> GitHub</a>
-            <a href="https://discord.gg/VPMhND2Def" target="_blank" class="contact-link"><i class="fab fa-discord"></i> Discord</a>
+        <div class="team-card">
+          <div class="team-avatar"><img src="https://avatars.githubusercontent.com/u/211171340?v=4" alt="Zoid"></div>
+          <div>
+            <div class="team-name">Zoid</div>
+            <div class="team-handle">@Zaa-iddd</div>
           </div>
+          <div class="team-bio">Student &middot; Aspiring Dev</div>
+          <div class="team-stats">
+            <div class="team-stat"><strong>2</strong> repos</div>
+            <div class="team-stat"><strong>7</strong> followers</div>
+          </div>
+          <a href="https://github.com/Zaa-iddd" target="_blank" class="team-gh-btn"><i class="fab fa-github"></i> View GitHub</a>
         </div>
       </div>
     </div>
@@ -736,20 +735,24 @@
           ripples.push({ x, y, r: 3, maxR, alpha: 0.38 });
         };
 
-        const orbEls = [document.getElementById('orb0'), document.getElementById('orb1')];
+        const orbEls = Array.from(pool.querySelectorAll('.pool-icon'));
         const ORB_R = 30;
         let mx = -9999, my = -9999, inside = false, t = 0;
         let lastMx = -9999, lastMy = -9999;
 
-        const orbs = orbEls.map((el, i) => ({
-          el,
-          x: (pool.clientWidth || 800) * (i === 0 ? 0.28 : 0.72),
-          y: (pool.clientHeight || 220) * 0.5,
-          vx: (i === 0 ? 0.45 : -0.38),
-          vy: (i === 0 ? -0.3 : 0.4),
-          angle: i === 0 ? 0.5 : 2.8,
-          rTimer: i * 55,
-        }));
+        const N = orbEls.length;
+        const orbs = orbEls.map((el, i) => {
+          const ang = (i / Math.max(N, 1)) * Math.PI * 2 + 0.4;
+          return {
+            el,
+            x: (pool.clientWidth || 800) * (N <= 1 ? 0.5 : 0.2 + 0.6 * (i / (N - 1))),
+            y: (pool.clientHeight || 220) * (i % 2 ? 0.62 : 0.38),
+            vx: Math.cos(ang) * 0.42,
+            vy: Math.sin(ang) * 0.42,
+            angle: ang,
+            rTimer: i * 45,
+          };
+        });
 
         orbs.forEach(o => {
           o.el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);z-index:2;will-change:left,top;';
@@ -833,6 +836,65 @@
         requestAnimationFrame(frame);
       }
     });
+  </script>
+
+  <!-- ── DYNAMIC PROJECTS (Supabase) ─────────────────────────── -->
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function(){
+      if(!window.SUPABASE_URL || window.SUPABASE_URL.includes('YOUR-PROJECT')) return; // keep static cards
+      const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      const esc = s => (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      function statusClass(s){
+        s = (s||'').toLowerCase();
+        return (s.includes('web') || s.includes('mobile') || s.includes('tool')) ? 'status-web' : 'status-live';
+      }
+      function card(p){
+        const href = 'post.html?id=' + encodeURIComponent(p.id);
+        const ext  = '';
+        const icon = p.icon_url
+          ? `<div class="app-card-icon"><img src="${esc(p.icon_url)}" alt="${esc(p.title)}"></div>`
+          : `<div class="app-card-icon" style="background:var(--accent-dim);color:var(--accent);display:grid;place-items:center;font-weight:800;">${esc((p.title||'•').trim()[0]||'•')}</div>`;
+        return `<a href="${href}"${ext} class="app-card">
+          <div class="app-card-header">
+            ${icon}
+            <div>
+              <div class="app-card-name">${esc(p.title)}</div>
+              <div class="app-card-cat">${esc(p.category||'Project')}</div>
+            </div>
+          </div>
+          <p class="app-card-desc">${esc(p.description||'')}</p>
+          <div class="app-card-footer">
+            <span class="app-card-status ${statusClass(p.status)}"><span class="status-dot"></span> ${esc(p.status||'Live')}</span>
+            <i class="fas fa-arrow-up-right app-card-arrow"></i>
+          </div>
+        </a>`;
+      }
+
+      sb.from('projects').select('*').eq('published', true)
+        .order('featured',{ascending:false})
+        .order('sort_order',{ascending:false})
+        .order('created_at',{ascending:false})
+        .then(({ data, error }) => {
+          if(error || !data || !data.length) return; // nothing posted yet — keep the hard-coded cards
+          const grid = document.getElementById('appsGrid');
+          if(!grid) return;
+          const coming = grid.querySelector('.coming-card');
+          // don't duplicate a project that already has a hard-coded card
+          const existing = new Set(
+            [...grid.querySelectorAll('.app-card-name')].map(n => n.textContent.trim().toLowerCase())
+          );
+          const html = data
+            .filter(p => !existing.has((p.title||'').trim().toLowerCase()))
+            .map(card).join('');
+          if(!html) return;
+          const frag = document.createRange().createContextualFragment(html);
+          if(coming) grid.insertBefore(frag, coming);   // add posted projects before "More apps coming"
+          else grid.appendChild(frag);
+        });
+    })();
   </script>
 </body>
 </html>
