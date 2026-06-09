@@ -7,11 +7,13 @@ const PALETTES = {
   navy:     { name: "Navy",     dark: false, accent: "#34507a", bg: "#eceef3", surface: "#ffffff", text: "#1c2430", sub: "#73809a", line: "#d8dde7" },
   wine:     { name: "Wine",     dark: false, accent: "#8a3b4b", bg: "#f4eded", surface: "#fffafa", text: "#2c1c20", sub: "#937076", line: "#e7d6d8" },
   charcoal: { name: "Charcoal", dark: false, accent: "#3a3531", bg: "#eeecea", surface: "#ffffff", text: "#1f1c19", sub: "#807a73", line: "#ded9d4" },
+  olive:    { name: "Olive",    dark: false, accent: "#8b8646", bg: "#ece6d1", surface: "#f6f1e1", text: "#2d2c22", sub: "#8c8768", line: "#ddd6bd" },
   // Dark themes
   noir:     { name: "Noir",     dark: true,  accent: "#c8a97e", bg: "#141414", surface: "#1f1f1f", text: "#ededed", sub: "#8f8f8f", line: "#2e2e2e" },
   midnight: { name: "Midnight", dark: true,  accent: "#5b8fd6", bg: "#0e1422", surface: "#182030", text: "#e6ecf6", sub: "#8a98b2", line: "#27324a" },
   espresso: { name: "Espresso", dark: true,  accent: "#d08a4f", bg: "#1a1410", surface: "#241c16", text: "#f1e7d9", sub: "#ab9580", line: "#372b21" },
   emerald:  { name: "Emerald",  dark: true,  accent: "#46b083", bg: "#0f1814", surface: "#16221c", text: "#e2efe8", sub: "#80998d", line: "#22322a" },
+  olivedark:{ name: "Olive Dark",dark: true, accent: "#c9c06a", bg: "#16150d", surface: "#201f14", text: "#eee9d4", sub: "#9b9670", line: "#33301f" },
 };
 
 // 5 layout presets. Each defines how the POS panes arrange.
