@@ -17,7 +17,7 @@ function ThemeToggle() {
   );
 }
 
-function TopBar({ cfg, set, onReadyMade, onExport, onSubmit }) {
+function TopBar({ cfg, set, canUndo, canRedo, onUndo, onRedo, onReset, onReadyMade, onExport, onSubmit }) {
   return (
     <div className="topbar">
       <a className="logo" href="../" title="Back to kape.dev">
@@ -66,6 +66,11 @@ function TopBar({ cfg, set, onReadyMade, onExport, onSubmit }) {
       )}
 
       <div className="grow" />
+      <div className="seg">
+        <button title="Undo (Ctrl+Z)" disabled={!canUndo} onClick={onUndo}>↶</button>
+        <button title="Redo (Ctrl+Shift+Z)" disabled={!canRedo} onClick={onRedo}>↷</button>
+      </div>
+      <button className="btn ghost" title="Reset to defaults" onClick={onReset}>↺ Reset</button>
       <ThemeToggle />
       <button className="btn ghost" onClick={onExport}>↧ Export spec</button>
       <button className="btn solid" onClick={onSubmit}>Submit commission →</button>
