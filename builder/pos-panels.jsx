@@ -206,11 +206,12 @@ function RadiusRow({ label, value, onChange }) {
   );
 }
 
-function ColorRow({ label, value, onChange }) {
+function ColorRow({ label, value, onChange, warn }) {
   const norm = (v) => { v = (v || "").trim(); if (v && v[0] !== "#") v = "#" + v; return v; };
   return (
-    <div className="color-row">
+    <div className={"color-row" + (warn ? " has-warn" : "")}>
       <span className="mono">{label}</span>
+      {warn && <span className="contrast-warn" title={warn}>⚠ low contrast</span>}
       <label className="color-ctl">
         <input type="color" value={value} onChange={(e) => onChange(e.target.value)} />
         <input className="hexinp" value={value} maxLength={7} spellCheck={false}
@@ -272,9 +273,18 @@ function Inspector({ cfg, set }) {
             const cp = cfg.customPalette || window.DEFAULT_CUSTOM;
             const isCustom = cfg.palette === "custom";
             const resolved = window.buildCustom(cp);
-            const warn = [];
-            if (window.contrastRatio(cp.text, cp.bg) < 4) warn.push("text vs background is low");
-            if (window.contrastRatio(resolved.onAccent, cp.accent) < 3) warn.push("button text vs accent is low");
+            // WCAG AA: 4.5:1 for body text, 3:1 for large/button text.
+            const textOnBg = window.contrastRatio(cp.text, cp.bg);
+            const textOnSurface = window.contrastRatio(cp.text, cp.surface);
+            const btnText = window.contrastRatio(resolved.onAccent, cp.accent);
+            const textLow = textOnBg < 4.5 || textOnSurface < 4.5;
+            const rowWarn = {
+              accent: btnText < 3 ? "Button labels are hard to read on this accent — pick a darker or lighter accent" : "",
+              bg: textOnBg < 4.5 ? "Your text colour is hard to read on this background" : "",
+              surface: textOnSurface < 4.5 ? "Your text colour is hard to read on cards / panels (surface)" : "",
+              text: textLow ? "This text colour is too low-contrast against your background / surface" : "",
+            };
+            const anyWarn = !!(rowWarn.accent || textLow);
             return (
               <div className="sw-group">
                 <span className="sw-grp-label">Custom</span>
@@ -288,10 +298,12 @@ function Inspector({ cfg, set }) {
                 {isCustom && (
                   <div className="custom-edit">
                     {[["accent", "Accent"], ["bg", "Background"], ["surface", "Surface"], ["text", "Text"]].map(([k, lb]) => (
-                      <ColorRow key={k} label={lb} value={cp[k]} onChange={(v) => set.customColor(k, v)} />
+                      <ColorRow key={k} label={lb} value={cp[k]} warn={rowWarn[k]} onChange={(v) => set.customColor(k, v)} />
                     ))}
                     <div className="hint">
-                      Sub-text, hairlines &amp; button text auto-adjust. {warn.length ? <b>⚠ {warn.join(" · ")}.</b> : "Contrast looks good ✓"}
+                      Sub-text, hairlines &amp; button text auto-adjust. {anyWarn
+                        ? <b className="warn-txt">⚠ Some colours are hard to read (see badges above) — text needs ~4.5:1 contrast.</b>
+                        : "Contrast looks good ✓"}
                     </div>
                   </div>
                 )}
