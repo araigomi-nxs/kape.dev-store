@@ -27,7 +27,7 @@ function useFit(w, h, bezel = 36) {
 // the boutique skin flexibly inside small preview boxes (review modal, etc.)
 // without cropping or scrollbars. The child stays at natural width so PNG
 // capture remains full-resolution.
-function FitBox({ width = 1040, children }) {
+function FitBox({ width = 1040, max = 1, children }) {
   const box = useRef(null);
   const inner = useRef(null);
   const [scale, setScale] = useState(0.5);
@@ -37,7 +37,7 @@ function FitBox({ width = 1040, children }) {
       if (!o || !i) return;
       const cw = o.clientWidth, ch = o.clientHeight;
       const nh = i.offsetHeight || 1;
-      const s = Math.min(cw / width, ch / nh, 1);
+      const s = Math.min(cw / width, ch / nh, max);
       setScale(s > 0.04 ? s : 0.2);
     };
     fit();
@@ -45,7 +45,7 @@ function FitBox({ width = 1040, children }) {
     if (box.current) ro.observe(box.current);
     if (inner.current) ro.observe(inner.current);
     return () => ro.disconnect();
-  }, [width]);
+  }, [width, max]);
   return (
     <div className="fitbox" ref={box}>
       <div className="fitbox-in" ref={inner} style={{ width, transform: `scale(${scale})` }}>
@@ -342,20 +342,132 @@ function TerminalLive({ cfg }) {
   );
 }
 
+// ---- Gallery skin -----------------------------------------------------------
+// A modern storefront design: photo-style product cards with badges, an order
+// rail with item thumbnails, quantity steppers, an order-notes field and a
+// floating add button. Palette/font/corner driven.
+function GalleryLive({ cfg }) {
+  const pal = window.resolvePalette(cfg);
+  const font = window.FONTS[cfg.font] || window.FONTS.inter;
+  const accent = pal.accent;
+  const surface = pal.surface;
+  const mix = (c, pct, base) => `color-mix(in srgb, ${c} ${pct}%, ${base})`;
+  const tabs = (cfg.tabs || []).slice(0, 4);
+  const vars = {
+    "--gl-accent": accent,
+    "--gl-on-accent": pal.onAccent || window.onAccentFor(accent),
+    "--gl-text": pal.text,
+    "--gl-sub": pal.sub,
+    "--gl-line": pal.line,
+    "--gl-surface": surface,
+    "--gl-bg": pal.bg,
+    "--gl-soft": mix(accent, 13, surface),
+    "--gl-chip": mix(accent, 7, surface),
+    "--gl-r-card": (cfg.radiusCard ?? 16) + "px",
+    "--gl-r-btn": (cfg.radiusButton ?? 12) + "px",
+    "--gl-r-panel": (cfg.radiusPanel ?? 16) + "px",
+    fontFamily: font.stack,
+  };
+  const items = [
+    { name: "Hot Green Tea", price: "$4.50", tag: "VEGAN", tk: "veg", grad: "linear-gradient(135deg,#d7e8cf,#a8c79f)", dot: true },
+    { name: "Matcha Latte", price: "$5.75", tag: "POPULAR", tk: "pop", grad: "linear-gradient(135deg,#dcecd2,#b0d2a3)" },
+    { name: "Milk Tea", price: "$6.25", tag: "NEW", tk: "new", grad: "linear-gradient(135deg,#eddcc6,#ccae8d)" },
+    { name: "Caramel Macchiato", price: "$6.00", ic: "🥤" },
+    { name: "Butter Croissant", price: "$3.25", ic: "🥐" },
+    { name: "Taro Swirl", price: "$5.50", ic: "🧋" },
+    { name: "Thai Iced Tea", price: "$5.25", grad: "linear-gradient(135deg,#f3d9b0,#dfa86a)", tag: "VEGAN", tk: "veg" },
+    { name: "Brown Sugar Boba", price: "$6.50", tag: "POPULAR", tk: "pop", grad: "linear-gradient(135deg,#e7cdb0,#b98c5e)" },
+    { name: "Mango Smoothie", price: "$5.75", ic: "🥭" },
+  ];
+  const order = [
+    { name: "Hot Green Tea", opt: "2x Large, Honey (+$0.00)", qty: "02", price: "$9.00", grad: "linear-gradient(135deg,#d7e8cf,#a8c79f)" },
+    { name: "Matcha Latte", opt: "1x Regular, Oat Milk (+$0.75)", qty: "01", price: "$5.75", grad: "linear-gradient(135deg,#dcecd2,#b0d2a3)" },
+  ];
+  return (
+    <div className="gl skin-screen" style={vars}>
+      <div className="gl-header">
+        <div className={"gl-logo" + (cfg.logo ? " has-img" : "")}>
+          {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
+        </div>
+        <div className="gl-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
+        <div className="gl-headright"><span className="gl-clock">09:41 AM</span><span className="gl-avatar" /></div>
+      </div>
+      <div className="gl-body">
+        <div className="gl-main">
+          <div className="gl-tabs">
+            <span className="gl-tab on">All Items</span>
+            {tabs.map((t, i) => (<span className="gl-tab" key={t + i}>{t}</span>))}
+          </div>
+          <div className="gl-grid">
+            {items.map((it, i) => (
+              <div className="gl-card" key={i}>
+                <div className={"gl-thumb" + (it.grad ? " photo" : "")} style={it.grad ? { backgroundImage: it.grad } : undefined}>
+                  {it.dot && <span className="gl-dot" />}
+                  {!it.grad && <span className="gl-thumb-ic">{it.ic}</span>}
+                </div>
+                <div className="gl-cardfoot">
+                  <div className="gl-info"><span className="gl-nm">{it.name}</span><span className="gl-price">{it.price}</span></div>
+                  {it.tag && <span className={"gl-badge " + it.tk}>{it.tag}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="gl-fab">+</div>
+        </div>
+        <div className="gl-side">
+          <div className="gl-side-head"><h3>Current Order</h3><span className="gl-clear">Clear cart</span></div>
+          <div className="gl-order">
+            {order.map((o, i) => (
+              <div className="gl-oitem" key={i}>
+                <span className="gl-othumb" style={{ backgroundImage: o.grad }} />
+                <div className="gl-oinfo"><span className="gl-onm">{o.name}</span><span className="gl-osub">{o.opt}</span></div>
+                <div className="gl-ostep"><span>−</span><b>{o.qty}</b><span>+</span></div>
+                <span className="gl-opr">{o.price}</span>
+              </div>
+            ))}
+          </div>
+          <div className="gl-notes">
+            <span className="gl-notes-lb">Order notes</span>
+            <div className="gl-notes-in">Add specific instructions…</div>
+          </div>
+          <div className="gl-totals">
+            <div className="gl-trow"><span>Subtotal</span><span>$14.75</span></div>
+            <div className="gl-trow"><span>Tax (5%)</span><span>$1.18</span></div>
+            <div className="gl-trow tot"><span>Total</span><span>$15.93</span></div>
+          </div>
+          <div className="gl-checkout">Checkout · $15.93</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // skin registry — maps cfg.skin → component (classic = generic builder preview)
-const SKINS = { boutique: BoutiqueLive, terminal: TerminalLive };
+const SKINS = { boutique: BoutiqueLive, terminal: TerminalLive, gallery: GalleryLive };
 function SkinView({ cfg }) {
   const C = SKINS[cfg.skin];
   return C ? <C cfg={cfg} /> : null;
 }
 
+// Renders a skin at its true device width (so container queries reflow for
+// tablet/phone), scaled to fit the canvas like the generic device preview.
+function SkinStage({ cfg, compact }) {
+  const dev = window.DEVICES[cfg.device] || window.DEVICES.tablet;
+  const [ref, scale] = useFit(dev.w, dev.h, compact ? 24 : 48);
+  return (
+    <div className="canvas-stage" ref={ref} style={compact ? { padding: 10, width: "100%", height: "100%" } : undefined}>
+      <div className="skin-frame" style={{ width: dev.w * scale, height: dev.h * scale }}>
+        <div className="skin-scaler" style={{ width: dev.w, height: dev.h, transform: `scale(${scale})` }}>
+          <SkinView cfg={cfg} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   if (cfg.skin && SKINS[cfg.skin]) {
-    return (
-      <div className="canvas-stage skin-stage" style={compact ? { padding: 0, width: "100%", height: "100%" } : undefined}>
-        <SkinView cfg={cfg} />
-      </div>
-    );
+    return <SkinStage cfg={cfg} compact={compact} />;
   }
   const pal = window.resolvePalette(cfg);
   const dev = window.DEVICES[cfg.device];
@@ -497,4 +609,4 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   );
 }
 
-Object.assign(window, { POSPreview, BoutiqueLive, TerminalLive, SKINS, SkinView, FitBox, useFit });
+Object.assign(window, { POSPreview, BoutiqueLive, TerminalLive, GalleryLive, SKINS, SkinView, FitBox, useFit });

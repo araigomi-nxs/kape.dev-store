@@ -90,8 +90,22 @@ const TEMPLATES = {
       sections: { header: true, search: false, tabs: true, menu: true, cart: true, notes: false, pay: true },
     },
   },
+  gallery: {
+    name: "Gallery",
+    tagline: "photo cards · badges · order notes",
+    cfg: {
+      skin: "gallery",
+      preset: "counter", cart: "right", menuCols: 3, menuLayout: "grid",
+      palette: "custom",
+      customPalette: { accent: "#9166d6", bg: "#faf8fd", surface: "#ffffff", text: "#2a2333" },
+      font: "jakarta",
+      radiusPanel: 16, radiusCard: 16, radiusButton: 12,
+      tabs: ["Warm Teas", "Iced Lattes", "Signature Boba"],
+      sections: { header: true, search: false, tabs: true, menu: true, cart: true, notes: true, pay: true },
+    },
+  },
 };
-const TEMPLATE_ORDER = ["boutique", "terminal"];
+const TEMPLATE_ORDER = ["boutique", "terminal", "gallery"];
 
 const DEVICES = {
   tablet:  { name: "Tablet",  w: 1024, h: 768, glyph: "▭", portrait: false },

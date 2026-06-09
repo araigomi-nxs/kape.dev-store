@@ -222,12 +222,12 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
                   {cfg.canvasMode === "receipt"
                     ? <ReceiptPreview cfg={cfg} compact={true} />
                     : isSkin
-                      ? <FitBox><SkinView cfg={{ ...cfg, selected: null }} /></FitBox>
+                      ? <FitBox width={1280}><SkinView cfg={{ ...cfg, selected: null }} /></FitBox>
                       : <POSPreview cfg={{ ...cfg, selected: null }} pickMode={false} onPick={() => {}} compact={true} />}
                 </div>
                 {isSkin && (
                   <div ref={capRef} aria-hidden="true"
-                    style={{ position: "fixed", left: -99999, top: 0, width: 1040, pointerEvents: "none" }}>
+                    style={{ position: "fixed", left: -99999, top: 0, width: 1280, pointerEvents: "none" }}>
                     <SkinView cfg={{ ...cfg, selected: null }} />
                   </div>
                 )}
@@ -321,7 +321,7 @@ function ReadyMadeModal({ cfg, set, onClose, toast }) {
         <div className="modal-body rm-body">
           <div className={"snap-wrap rm-snap" + (custom ? " custom" : "")}>
             {custom
-              ? <FitBox><SkinView cfg={previewCfg} /></FitBox>
+              ? <FitBox width={1280}><SkinView cfg={previewCfg} /></FitBox>
               : <POSPreview cfg={previewCfg} pickMode={false} onPick={() => {}} compact={true} />}
           </div>
         </div>
