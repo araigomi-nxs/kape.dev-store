@@ -442,8 +442,106 @@ function GalleryLive({ cfg }) {
   );
 }
 
+// ---- Console skin -----------------------------------------------------------
+// A dark "developer console" POS: snake_case mono labels, object IDs, a faint
+// watermark and an EXECUTE_PAYMENT action. Palette/font/corner driven.
+function ConsoleLive({ cfg }) {
+  const pal = window.resolvePalette(cfg);
+  const font = window.FONTS[cfg.font] || window.FONTS.inter;
+  const accent = pal.accent;
+  const surface = pal.surface;
+  const mix = (c, pct, base) => `color-mix(in srgb, ${c} ${pct}%, ${base})`;
+  const code = (s) => (s || "").toUpperCase().replace(/\s+/g, "_");
+  const tabs = (cfg.tabs || []).slice(0, 4);
+  const vars = {
+    "--cn-accent": accent,
+    "--cn-on-accent": pal.onAccent || window.onAccentFor(accent),
+    "--cn-text": pal.text,
+    "--cn-sub": pal.sub,
+    "--cn-line": pal.line,
+    "--cn-surface": surface,
+    "--cn-bg": pal.bg,
+    "--cn-soft": mix(accent, 22, surface),
+    "--cn-chip": mix(accent, 10, surface),
+    "--cn-r-card": (cfg.radiusCard ?? 10) + "px",
+    "--cn-r-btn": (cfg.radiusButton ?? 8) + "px",
+    fontFamily: font.stack,
+  };
+  const items = [
+    { id: "OBJ_01", grad: "linear-gradient(135deg,#3a5a40,#1f3a2a)", name: "Hot Green Tea", spec: "250ML / STEAMED", price: "$4.50" },
+    { id: "OBJ_02", grad: "linear-gradient(135deg,#4a6b3a,#2a3f24)", name: "Matcha Latte", spec: "OAT / 16OZ", price: "$5.75" },
+    { id: "OBJ_03", grad: "linear-gradient(135deg,#6b4a3a,#3a281f)", name: "Milk Tea", spec: "BOBA / 50%", price: "$6.20", qty: "3", on: true },
+    { id: "OBJ_04", grad: "linear-gradient(135deg,#5a4632,#33271b)", name: "Espresso", spec: "DOPPIO", price: "$3.25" },
+    { id: "OBJ_05", grad: "linear-gradient(135deg,#3a4f6b,#22303f)", name: "Cold Brew", spec: "18HR STEEP", price: "$4.75" },
+    { id: "OBJ_06", grad: "linear-gradient(135deg,#6b5232,#3a2c1a)", name: "Caramel Macchiato", spec: "CARAMEL / 16OZ", price: "$6.00" },
+    { id: "OBJ_07", grad: "linear-gradient(135deg,#6b3a3a,#3a2020)", name: "Chai Latte", spec: "SPICED / OAT", price: "$5.25" },
+    { id: "OBJ_08", grad: "linear-gradient(135deg,#445a6b,#26343f)", name: "Iced Americano", spec: "2-SHOT / ICE", price: "$3.75" },
+  ];
+  const order = [
+    { name: "Milk Tea", code: "82 · UNIT_3.10", qty: "02", price: "$12.40" },
+    { name: "Matcha Latte", code: "81 · UNIT_5.75", qty: "01", price: "$5.75" },
+  ];
+  const watermark = ((cfg.initials || cfg.business || "S").trim()[0] || "S").toUpperCase();
+  return (
+    <div className="cn skin-screen" style={vars}>
+      <div className="cn-header">
+        <div className={"cn-logo" + (cfg.logo ? " has-img" : "")}>
+          {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
+        </div>
+        <div className="cn-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
+        <div className="cn-headright"><span className="cn-clock">09:41 AM</span><span className="cn-avatar" /></div>
+      </div>
+      <div className="cn-body">
+        <div className="cn-main">
+          <div className="cn-tabs">
+            <span className="cn-tab on">ALL_ITEMS</span>
+            {tabs.map((t, i) => (<span className="cn-tab" key={t + i}>{code(t)}</span>))}
+            <span className="cn-status">DISPLAYING_{items.length}_OBJECTS</span>
+          </div>
+          <div className="cn-gridwrap">
+            <span className="cn-watermark">{watermark}</span>
+            <div className="cn-grid">
+              {items.map((it, i) => (
+                <div className={"cn-card" + (it.on ? " on" : "")} key={i}>
+                  {it.qty && <span className="cn-qbadge">{it.qty}</span>}
+                  <span className="cn-id">{it.id}</span>
+                  <div className="cn-thumb" style={{ backgroundImage: it.grad }} />
+                  <div className="cn-nm">{it.name}</div>
+                  <div className="cn-cardfoot"><span className="cn-spec">{it.spec}</span><span className="cn-price">{it.price}</span></div>
+                </div>
+              ))}
+              <div className="cn-add"><span className="cn-plus">+</span>ADD_CUSTOM_ENTRY</div>
+            </div>
+          </div>
+        </div>
+        <div className="cn-side">
+          <div className="cn-side-head"><h3>CURRENT_ORDER</h3><span className="cn-clear">⌫ CLEAR</span></div>
+          <div className="cn-ticket">
+            {order.map((o, i) => (
+              <div className="cn-tline" key={i}>
+                <div className="cn-tinfo"><span className="cn-tnm">{o.name}</span><span className="cn-tcode">{o.code}</span></div>
+                <div className="cn-tstep"><span>−</span><b>{o.qty}</b><span>+</span></div>
+                <span className="cn-tpr">{o.price}</span>
+              </div>
+            ))}
+          </div>
+          <div className="cn-totals">
+            <div className="cn-trow"><span>SUBTOTAL_NET</span><span>$18.15</span></div>
+            <div className="cn-trow"><span>TAX_PERCENT_10</span><span>$1.82</span></div>
+            <div className="cn-trow tot"><span>TOTAL_AMOUNT</span><span>$19.97</span></div>
+          </div>
+          <div className="cn-actions">
+            <div className="cn-void">VOID_ORDER</div>
+            <div className="cn-exec">⚡ EXECUTE_PAYMENT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // skin registry — maps cfg.skin → component (classic = generic builder preview)
-const SKINS = { boutique: BoutiqueLive, terminal: TerminalLive, gallery: GalleryLive };
+const SKINS = { boutique: BoutiqueLive, terminal: TerminalLive, gallery: GalleryLive, console: ConsoleLive };
 function SkinView({ cfg }) {
   const C = SKINS[cfg.skin];
   return C ? <C cfg={cfg} /> : null;
@@ -609,4 +707,4 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   );
 }
 
-Object.assign(window, { POSPreview, BoutiqueLive, TerminalLive, GalleryLive, SKINS, SkinView, FitBox, useFit });
+Object.assign(window, { POSPreview, BoutiqueLive, TerminalLive, GalleryLive, ConsoleLive, SKINS, SkinView, FitBox, useFit });

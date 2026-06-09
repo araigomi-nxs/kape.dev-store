@@ -104,8 +104,22 @@ const TEMPLATES = {
       sections: { header: true, search: false, tabs: true, menu: true, cart: true, notes: true, pay: true },
     },
   },
+  console: {
+    name: "Console",
+    tagline: "dark · mono · developer console",
+    cfg: {
+      skin: "console",
+      preset: "counter", cart: "right", menuCols: 3, menuLayout: "grid",
+      palette: "custom",
+      customPalette: { accent: "#7c5cff", bg: "#0c0a14", surface: "#16131f", text: "#e9e7f2" },
+      font: "grotesk",
+      radiusPanel: 10, radiusCard: 10, radiusButton: 8,
+      tabs: ["Hot Brews", "Cold Brew", "Pastries"],
+      sections: { header: true, search: false, tabs: true, menu: true, cart: true, notes: false, pay: true },
+    },
+  },
 };
-const TEMPLATE_ORDER = ["boutique", "terminal", "gallery"];
+const TEMPLATE_ORDER = ["boutique", "terminal", "gallery", "console"];
 
 const DEVICES = {
   tablet:  { name: "Tablet",  w: 1024, h: 768, glyph: "▭", portrait: false },
