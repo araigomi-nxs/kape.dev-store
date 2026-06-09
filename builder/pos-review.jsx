@@ -99,15 +99,23 @@ function Field({ label, req, value, onChange, err, placeholder, full, area }) {
 function ReviewModal({ cfg, mode, onClose, toast }) {
   const spec = buildSpec(cfg);
   const snapRef = useRef(null);
+  const capRef = useRef(null); // hidden full-size boutique render — captured at natural width
+  const isBoutique = cfg.skin === "boutique" && cfg.canvasMode !== "receipt";
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ name: "", business: cfg.business || "", email: "", contact: "", notes: "" });
   const [errs, setErrs] = useState({});
   const upd = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
+  // boutique is responsive — capture a dedicated full-width node so the layout
+  // doesn't collapse; everything else captures the scaled device screen.
+  const captureNode = () =>
+    (isBoutique && capRef.current && capRef.current.querySelector(".bq")) ||
+    (snapRef.current && snapRef.current.querySelector(".pos, .bq, .rcpt-capture"));
+
   const captureImage = async () => {
     // capture the full device-resolution screen (.pos), not the scaled-down frame, for a crisp PNG
-    const node = snapRef.current?.querySelector(".pos, .rcpt-capture");
+    const node = captureNode();
     if (!node || !window.htmlToImage) { toast("Image export unavailable offline — spec downloaded instead"); download("kape-pos-spec.txt", spec.text); return; }
     try {
       setBusy(true);
@@ -139,7 +147,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
         // render + upload a PNG snapshot of the chosen layout (best-effort)
         let snapshot_url = null;
         try {
-          const node = snapRef.current?.querySelector(".pos, .rcpt-capture");
+          const node = captureNode();
           if (node && window.htmlToImage) {
             const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: window.resolvePalette(cfg).bg });
             const blob = await (await fetch(dataUrl)).blob();
@@ -209,15 +217,23 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
               {/* left: snapshot */}
               <div className="review-left">
                 <span className="mono" style={{ display: "block", marginBottom: 10 }}>Layout snapshot</span>
-                <div className="snap-wrap" ref={snapRef} style={{ height: 240 }}>
+                <div className={"snap-wrap" + (cfg.skin === "boutique" && cfg.canvasMode !== "receipt" ? " custom" : "")} ref={snapRef} style={{ height: 240 }}>
                   {cfg.canvasMode === "receipt"
                     ? <ReceiptPreview cfg={cfg} compact={true} />
-                    : <POSPreview cfg={{ ...cfg, selected: null }} pickMode={false} onPick={() => {}} compact={true} />}
+                    : cfg.skin === "boutique"
+                      ? <FitBox><BoutiqueLive cfg={{ ...cfg, selected: null }} /></FitBox>
+                      : <POSPreview cfg={{ ...cfg, selected: null }} pickMode={false} onPick={() => {}} compact={true} />}
                 </div>
+                {isBoutique && (
+                  <div ref={capRef} aria-hidden="true"
+                    style={{ position: "fixed", left: -99999, top: 0, width: 1040, pointerEvents: "none" }}>
+                    <BoutiqueLive cfg={{ ...cfg, selected: null }} />
+                  </div>
+                )}
                 <div className="snap-cap">
                   {cfg.canvasMode === "receipt"
                     ? <>Receipt · {(window.RECEIPT_PAPERS[(cfg.receipt || {}).paper] || window.RECEIPT_PAPERS["80mm"]).name} · {window.resolvePalette(cfg).name}</>
-                    : <>{window.DEVICES[cfg.device].name} · {window.PRESETS[cfg.preset].name} · {window.resolvePalette(cfg).name}</>}
+                    : <>{window.DEVICES[cfg.device].name} · {isBoutique ? "Boutique" : window.PRESETS[cfg.preset].name} · {window.resolvePalette(cfg).name}</>}
                 </div>
 
                 <div style={{ display: "flex", gap: 9, marginTop: 14 }}>
@@ -278,4 +294,46 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
   );
 }
 
-Object.assign(window, { ReviewModal, buildSpec });
+// Ready-made template browser. Shows the design preview only; "Next →" cycles
+// to the next ready-made design, "Customize it" applies the one on screen.
+// Applying merges the template over the current cfg, so the customer's business
+// name & logo are preserved.
+function ReadyMadeModal({ cfg, set, onClose, toast }) {
+  const keys = window.TEMPLATE_ORDER;
+  const [idx, setIdx] = useState(0);
+  const k = keys[idx];
+  const t = window.TEMPLATES[k];
+  const previewCfg = { ...cfg, ...t.cfg, sections: { ...cfg.sections, ...t.cfg.sections }, selected: null };
+  const custom = previewCfg.skin && previewCfg.skin !== "classic";
+
+  return (
+    <div className="overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal rm-modal">
+        <div className="modal-head">
+          <div>
+            <h2>Ready-made designs</h2>
+            <span className="mono">// {t.name} · {idx + 1} of {keys.length}</span>
+          </div>
+          <button className="modal-x" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="modal-body rm-body">
+          <div className={"snap-wrap rm-snap" + (custom ? " custom" : "")}>
+            {custom
+              ? <FitBox><BoutiqueLive cfg={previewCfg} /></FitBox>
+              : <POSPreview cfg={previewCfg} pickMode={false} onPick={() => {}} compact={true} />}
+          </div>
+        </div>
+
+        <div className="modal-foot">
+          <span className="note">// {t.name} — {t.tagline}</span>
+          <div className="grow" />
+          <button className="btn ghost" onClick={() => { set.applyTemplate(k); toast(t.name + " applied — customize away"); onClose(); }}>Customize it</button>
+          <button className="btn solid" onClick={() => setIdx((i) => (i + 1) % keys.length)}>Next →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { ReviewModal, ReadyMadeModal, buildSpec });

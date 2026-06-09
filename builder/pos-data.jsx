@@ -59,6 +59,26 @@ const PRESETS = {
 };
 const PRESET_ORDER = ["counter", "cartleft", "stacked", "triple", "minimal"];
 
+// Ready-made designs — one click applies a full look (layout + theme + font +
+// sections + tabs). Separate from layout PRESETS, which only rearrange panes.
+const TEMPLATES = {
+  boutique: {
+    name: "Boutique",
+    tagline: "greeting · pill tabs · café vibe",
+    cfg: {
+      skin: "boutique", // renders the dedicated café design (window.BoutiqueLive)
+      preset: "counter", cart: "right", menuCols: 3, menuLayout: "grid",
+      palette: "custom",
+      customPalette: { accent: "#8b6fc7", bg: "#f5f2fb", surface: "#ffffff", text: "#241f33" },
+      font: "poppins",
+      radiusPanel: 16, radiusCard: 16, radiusButton: 14,
+      tabs: ["Tea", "Pastries", "Coffee"],
+      sections: { header: true, search: true, tabs: true, menu: true, cart: true, notes: false, pay: true },
+    },
+  },
+};
+const TEMPLATE_ORDER = ["boutique"];
+
 const DEVICES = {
   tablet:  { name: "Tablet",  w: 1024, h: 768, glyph: "▭", portrait: false },
   desktop: { name: "Desktop", w: 1280, h: 800, glyph: "⬛", portrait: false },
@@ -122,6 +142,7 @@ const ALL_TABS = ["Coffee", "Tea", "Pastries", "Specials", "Drinks", "Sandwiches
 // Sections that can be shown/hidden (in stacking order, top→bottom in layers list)
 const SECTION_DEFS = [
   { id: "header", label: "Header + logo", locked: true },
+  { id: "search", label: "Search bar",    locked: false },
   { id: "tabs",   label: "Category tabs", locked: false },
   { id: "menu",   label: "Menu grid",     locked: true },
   { id: "cart",   label: "Order cart",    locked: false },
@@ -130,6 +151,7 @@ const SECTION_DEFS = [
 ];
 
 const DEFAULT_CONFIG = {
+  skin: "classic", // classic = generic builder preview · "boutique" = café skin
   preset: "counter",
   device: "tablet",
   palette: "coffee",
@@ -142,7 +164,7 @@ const DEFAULT_CONFIG = {
   logo: null,       // uploaded logo as a downscaled data-URL (overrides initials when set)
   logoSize: 46,     // displayed logo height on the receipt (px); header scales from this
   tabs: ["Coffee", "Tea", "Pastries", "Specials"],
-  sections: { header: true, tabs: true, menu: true, cart: true, notes: false, pay: true },
+  sections: { header: true, search: false, tabs: true, menu: true, cart: true, notes: false, pay: true },
   cart: "right",   // overrides preset cart when user repositions
   menuCols: 3,
   menuLayout: "grid", // grid | list | compact
@@ -154,4 +176,4 @@ const DEFAULT_CONFIG = {
   selected: "menu",
 };
 
-Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, RECEIPT_PAPERS, RECEIPT_PAPER_ORDER, RECEIPT_DEFS, RECEIPT_DEFAULTS, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG, resolvePalette, buildCustom, contrastRatio, onAccentFor, DEFAULT_CUSTOM });
+Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, TEMPLATES, TEMPLATE_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, RECEIPT_PAPERS, RECEIPT_PAPER_ORDER, RECEIPT_DEFS, RECEIPT_DEFAULTS, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG, resolvePalette, buildCustom, contrastRatio, onAccentFor, DEFAULT_CUSTOM });

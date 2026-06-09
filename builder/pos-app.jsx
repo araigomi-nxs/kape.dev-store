@@ -4,7 +4,12 @@ const { useState: useS, useEffect: useE } = React;
 function loadCfg() {
   try {
     const raw = localStorage.getItem("kape_pos_cfg");
-    if (raw) return { ...window.DEFAULT_CONFIG, ...JSON.parse(raw) };
+    if (raw) {
+      const c = { ...window.DEFAULT_CONFIG, ...JSON.parse(raw) };
+      // guard against stale values from older builds (e.g. a removed preset)
+      if (!window.PRESETS[c.preset]) c.preset = window.DEFAULT_CONFIG.preset;
+      return c;
+    }
   } catch (e) {}
   return { ...window.DEFAULT_CONFIG };
 }
@@ -24,7 +29,12 @@ function App() {
     patch: (o) => setCfg((c) => ({ ...c, ...o })),
     preset: (k) => setCfg((c) => {
       const p = window.PRESETS[k];
-      return { ...c, preset: k, cart: p.cart, menuCols: p.menuCols, sections: { ...c.sections, cart: p.cart !== "none" } };
+      return { ...c, skin: "classic", preset: k, cart: p.cart, menuCols: p.menuCols, sections: { ...c.sections, cart: p.cart !== "none" } };
+    }),
+    applyTemplate: (k) => setCfg((c) => {
+      const t = window.TEMPLATES[k];
+      if (!t) return c;
+      return { ...c, ...t.cfg, sections: { ...c.sections, ...t.cfg.sections } };
     }),
     availableTabs: () => window.ALL_TABS.filter((t) => !cfg.tabs.includes(t)),
     addTab: (t) => setCfg((c) => {
@@ -58,7 +68,7 @@ function App() {
 
   return (
     <div className="app">
-      <TopBar cfg={cfg} set={set} onExport={() => setModal("export")} onSubmit={() => setModal("submit")} />
+      <TopBar cfg={cfg} set={set} onReadyMade={() => setModal("readymade")} onExport={() => setModal("export")} onSubmit={() => setModal("submit")} />
       <div className="body">
         {receiptMode ? <ReceiptLayers cfg={cfg} set={set} /> : <LeftPanel cfg={cfg} set={set} />}
 
@@ -71,8 +81,8 @@ function App() {
               </>
             ) : (
               <>
-                <span className="pill"><b>{window.PRESETS[cfg.preset].name}</b> · {window.DEVICES[cfg.device].name}</span>
-                <span className="pill">{sel ? <>selected: <b>{sel}</b></> : <>click an element to select →</>}</span>
+                <span className="pill"><b>{cfg.skin === "boutique" ? "Boutique" : window.PRESETS[cfg.preset].name}</b> · {window.DEVICES[cfg.device].name}</span>
+                <span className="pill">{cfg.skin === "boutique" ? <>ready-made design · edit theme &amp; font →</> : sel ? <>selected: <b>{sel}</b></> : <>click an element to select →</>}</span>
               </>
             )}
             <div className="grow" />
@@ -86,7 +96,8 @@ function App() {
         {receiptMode ? <ReceiptInspector cfg={cfg} set={set} /> : <Inspector cfg={cfg} set={set} />}
       </div>
 
-      {modal && <ReviewModal cfg={cfg} mode={modal} onClose={() => setModal(null)} toast={toast} />}
+      {modal === "readymade" && <ReadyMadeModal cfg={cfg} set={set} onClose={() => setModal(null)} toast={toast} />}
+      {(modal === "submit" || modal === "export") && <ReviewModal cfg={cfg} mode={modal} onClose={() => setModal(null)} toast={toast} />}
 
       <div className={"toast" + (toastMsg ? " show" : "")}>
         <span className="ic">✓</span>{toastMsg}

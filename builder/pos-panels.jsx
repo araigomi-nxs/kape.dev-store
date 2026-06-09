@@ -17,7 +17,7 @@ function ThemeToggle() {
   );
 }
 
-function TopBar({ cfg, set, onExport, onSubmit }) {
+function TopBar({ cfg, set, onReadyMade, onExport, onSubmit }) {
   return (
     <div className="topbar">
       <a className="logo" href="../" title="Back to kape.dev">
@@ -36,6 +36,11 @@ function TopBar({ cfg, set, onExport, onSubmit }) {
 
       {cfg.canvasMode !== "receipt" && (
         <>
+          <div className="tb-group">
+            <span className="mono">Ready-made</span>
+            <button className="btn ghost rm-btn" onClick={onReadyMade}>✦ Browse designs</button>
+          </div>
+
           <div className="tb-group">
             <span className="mono">Preset</span>
             <div className="seg">

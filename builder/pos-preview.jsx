@@ -23,6 +23,38 @@ function useFit(w, h, bezel = 36) {
   return [ref, scale];
 }
 
+// Scales a fixed-width child down to fit its container (both axes). Used to show
+// the boutique skin flexibly inside small preview boxes (review modal, etc.)
+// without cropping or scrollbars. The child stays at natural width so PNG
+// capture remains full-resolution.
+function FitBox({ width = 1040, children }) {
+  const box = useRef(null);
+  const inner = useRef(null);
+  const [scale, setScale] = useState(0.5);
+  useLayoutEffect(() => {
+    const fit = () => {
+      const o = box.current, i = inner.current;
+      if (!o || !i) return;
+      const cw = o.clientWidth, ch = o.clientHeight;
+      const nh = i.offsetHeight || 1;
+      const s = Math.min(cw / width, ch / nh, 1);
+      setScale(s > 0.04 ? s : 0.2);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    if (box.current) ro.observe(box.current);
+    if (inner.current) ro.observe(inner.current);
+    return () => ro.disconnect();
+  }, [width]);
+  return (
+    <div className="fitbox" ref={box}>
+      <div className="fitbox-in" ref={inner} style={{ width, transform: `scale(${scale})` }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function MenuGrid({ cfg, pal, cols }) {
   const active = cfg.tabs[0] || "Coffee";
   const items = (window.SAMPLE[active] || window.SAMPLE.Coffee);
@@ -127,7 +159,106 @@ function Zone({ id, picked, pickMode, onPick, tag, children, style }) {
   );
 }
 
+// ---- Boutique skin ----------------------------------------------------------
+// A distinct "café" design (greeting hero · pill tabs · icon cards · order rail).
+// Driven by cfg so theme/font/corners stay customizable; used in both the
+// ready-made modal and the live builder canvas, so they always match.
+function BoutiqueLive({ cfg }) {
+  const pal = window.resolvePalette(cfg);
+  const font = window.FONTS[cfg.font] || window.FONTS.inter;
+  const accent = pal.accent;
+  const surface = pal.surface;
+  const mix = (c, pct, base) => `color-mix(in srgb, ${c} ${pct}%, ${base})`;
+  const tabs = (cfg.tabs || []).slice(0, 4);
+  const tabCls = ["", "yellow", "lav"];
+  const vars = {
+    "--bq-accent": accent,
+    "--bq-on-accent": pal.onAccent || window.onAccentFor(accent),
+    "--bq-text": pal.text,
+    "--bq-sub": pal.sub,
+    "--bq-line": pal.line,
+    "--bq-surface": surface,
+    "--bq-bg": pal.bg,
+    "--bq-soft": mix(accent, 14, surface),
+    "--bq-chip": mix(accent, 9, surface),
+    "--bq-hero": `linear-gradient(120deg, ${mix(accent, 22, surface)} 0%, ${mix(accent, 8, surface)} 100%)`,
+    "--bq-r-card": (cfg.radiusCard ?? 16) + "px",
+    "--bq-r-btn": (cfg.radiusButton ?? 14) + "px",
+    "--bq-r-panel": (cfg.radiusPanel ?? 16) + "px",
+    fontFamily: font.stack,
+  };
+  const cards1 = [
+    { ic: "🍵", icbg: "#e9ddf9", name: "Hot Green Tea", desc: "Premium ceremonial grade", price: "$6.50" },
+    { ic: "🍵", icbg: "#d8efe0", name: "Matcha Latte", desc: "Silky smooth oat milk base", price: "$6.50", badge: "hot" },
+    { ic: "🧋", icbg: "#f7dcec", name: "Milk Tea", desc: "Earl Grey with honey pearls", price: "$4.75" },
+  ];
+  const cards2 = [
+    { ic: "🥐", icbg: "#f3e6cf", name: "Butter Croissant", desc: "Flaky, baked fresh daily", price: "$3.25" },
+    { ic: "🧁", icbg: "#f7dcec", name: "Berry Muffin", desc: "Wild blueberry compote", price: "$3.75" },
+    { ic: "🍰", icbg: "#e9ddf9", name: "Basque Cheesecake", desc: "Burnt-top, creamy centre", price: "$5.50", badge: "LIMITED EDITION", gold: true },
+  ];
+  const Card = (c, i) => (
+    <div className="bq-card" key={i}>
+      <div className="bq-card-top">
+        <span className="bq-ic" style={{ background: mix(c.icbg, 62, surface) }}>{c.ic}</span>
+        {c.badge && <span className={"bq-badge" + (c.gold ? " gold" : "")}>{c.badge}</span>}
+      </div>
+      <h4 className="bq-nm">{c.name}</h4>
+      <p className="bq-desc">{c.desc}</p>
+      <div className="bq-cardfoot"><span className="bq-price">{c.price}</span><span className="bq-add">+</span></div>
+    </div>
+  );
+  return (
+    <div className="bq" style={vars}>
+      <div className="bq-header">
+        <div className={"bq-logo" + (cfg.logo ? " has-img" : "")}>
+          {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
+        </div>
+        <div className="bq-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
+        <div className="bq-headright"><span className="bq-clock">09:41 AM</span><span className="bq-avatar" /></div>
+      </div>
+      <div className="bq-body">
+      <div className="bq-main">
+        <div className="bq-hero">
+          <h2>Good morning,<br />Cashier!</h2>
+          <p>Ready to serve some warmth? Explore our fresh pastry selection and seasonal teas.</p>
+        </div>
+        <div className="bq-tabs">
+          <span className="bq-tab dark">All Items</span>
+          {tabs.map((t, i) => (<span className={("bq-tab " + tabCls[i % 3]).trim()} key={t + i}>{t}</span>))}
+        </div>
+        <div className="bq-sec"><i />Tea Classics</div>
+        <div className="bq-grid">{cards1.map(Card)}</div>
+        <div className="bq-sec"><i />Fresh Pastries</div>
+        <div className="bq-grid">{cards2.map(Card)}</div>
+      </div>
+      <div className="bq-side">
+        <div className="bq-side-head"><h3>Current Order</h3><span className="bq-order-no">#A12</span></div>
+        <div className="bq-modes"><span className="bq-mode on">Dine in</span><span className="bq-mode">To go</span></div>
+        <div className="bq-line">
+          <div className="bq-line-info"><span className="bq-line-nm">Matcha Latte</span><span className="bq-line-sub">x1 · $6.50</span></div>
+          <div className="bq-stepper"><span>−</span><b>1</b><span>+</span></div>
+        </div>
+        <div className="bq-totals">
+          <div className="bq-trow"><span>Subtotal</span><span>$5.50</span></div>
+          <div className="bq-trow"><span>Tax (5%)</span><span>$0.28</span></div>
+          <div className="bq-trow tot"><span>Total</span><span>$5.78</span></div>
+        </div>
+        <div className="bq-checkout">🛒 Checkout</div>
+      </div>
+      </div>
+    </div>
+  );
+}
+
 function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
+  if (cfg.skin === "boutique") {
+    return (
+      <div className="canvas-stage bq-stage" style={compact ? { padding: 0, width: "100%", height: "100%" } : undefined}>
+        <BoutiqueLive cfg={cfg} />
+      </div>
+    );
+  }
   const pal = window.resolvePalette(cfg);
   const dev = window.DEVICES[cfg.device];
   const preset = window.PRESETS[cfg.preset];
@@ -227,6 +358,16 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
             </div>
           </Zone>
 
+          {/* search */}
+          {S.search && (
+            <Zone id="search" picked={cfg.selected === "search"} pickMode={pickMode} onPick={onPick} tag="search bar" style={{ flex: "none" }}>
+              <div className="pos-search">
+                <span className="pos-search-ic">⌕</span>
+                <span className="pos-search-ph">Search the menu…</span>
+              </div>
+            </Zone>
+          )}
+
           {/* tabs */}
           {S.tabs && (
             <Zone id="tabs" picked={cfg.selected === "tabs"} pickMode={pickMode} onPick={onPick} tag="category tabs" style={{ flex: "none" }}>
@@ -258,4 +399,4 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   );
 }
 
-Object.assign(window, { POSPreview, useFit });
+Object.assign(window, { POSPreview, BoutiqueLive, FitBox, useFit });
