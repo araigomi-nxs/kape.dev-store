@@ -106,7 +106,8 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
   const upd = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
   const captureImage = async () => {
-    const node = snapRef.current?.querySelector(".pos-frame, .rcpt-capture");
+    // capture the full device-resolution screen (.pos), not the scaled-down frame, for a crisp PNG
+    const node = snapRef.current?.querySelector(".pos, .rcpt-capture");
     if (!node || !window.htmlToImage) { toast("Image export unavailable offline — spec downloaded instead"); download("kape-pos-spec.txt", spec.text); return; }
     try {
       setBusy(true);
@@ -138,7 +139,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
         // render + upload a PNG snapshot of the chosen layout (best-effort)
         let snapshot_url = null;
         try {
-          const node = snapRef.current?.querySelector(".pos-frame, .rcpt-capture");
+          const node = snapRef.current?.querySelector(".pos, .rcpt-capture");
           if (node && window.htmlToImage) {
             const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: window.resolvePalette(cfg).bg });
             const blob = await (await fetch(dataUrl)).blob();
