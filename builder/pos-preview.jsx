@@ -131,6 +131,7 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const pal = window.PALETTES[cfg.palette];
   const dev = window.DEVICES[cfg.device];
   const preset = window.PRESETS[cfg.preset];
+  const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const [ref, scale] = useFit(dev.w, dev.h, compact ? 24 : 40);
   const S = cfg.sections;
   const phone = dev.portrait;
@@ -142,6 +143,7 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const posVars = {
     "--pos-accent": pal.accent, "--pos-bg": pal.bg, "--pos-surface": pal.surface,
     "--pos-text": pal.text, "--pos-sub": pal.sub, "--pos-line": pal.line,
+    "--pos-font": font.stack,
     "--pos-r-panel": (cfg.radiusPanel ?? 14) + "px",
     "--pos-r-card": (cfg.radiusCard ?? 12) + "px",
     "--pos-r-btn": (cfg.radiusButton ?? 11) + "px",

@@ -167,6 +167,25 @@ function Inspector({ cfg, set }) {
           ))}
         </div>
 
+        {/* typeface */}
+        <div className="insp-sec">
+          <span className="mono">Typeface</span>
+          <div className="fontlist">
+            {window.FONT_ORDER.map((k) => {
+              const f = window.FONTS[k];
+              return (
+                <button key={k} className={"fontchip" + ((cfg.font || "inter") === k ? " on" : "")}
+                  style={{ fontFamily: f.stack }} onClick={() => set.patch({ font: k })}>
+                  <span className="fnm">{f.name}</span>
+                  <span className="fpv">Espresso ₱90</span>
+                  <span className="fnote">{f.note}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="hint">Sets the typeface across your POS — brand, tabs, menu &amp; cart. Mono labels (clock, captions) stay fixed.</div>
+        </div>
+
         {/* corner radius */}
         <div className="insp-sec">
           <span className="mono">Corner radius</span>

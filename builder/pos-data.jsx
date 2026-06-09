@@ -33,6 +33,20 @@ const DEVICES = {
 };
 const DEVICE_ORDER = ["tablet", "desktop", "phone"];
 
+// Typefaces the customer can apply to THEIR pos (loaded via Google Fonts in pos-builder.css).
+// `stack` is dropped straight into the --pos-font CSS var; mono labels stay fixed.
+const FONTS = {
+  inter:    { name: "Inter",          stack: "'Inter', sans-serif",             note: "clean · neutral" },
+  poppins:  { name: "Poppins",        stack: "'Poppins', sans-serif",           note: "rounded · friendly" },
+  manrope:  { name: "Manrope",        stack: "'Manrope', sans-serif",           note: "modern · soft" },
+  jakarta:  { name: "Plus Jakarta",   stack: "'Plus Jakarta Sans', sans-serif", note: "crisp · premium" },
+  grotesk:  { name: "Space Grotesk",  stack: "'Space Grotesk', sans-serif",     note: "techy · bold" },
+  dmsans:   { name: "DM Sans",        stack: "'DM Sans', sans-serif",           note: "geometric · tidy" },
+  fraunces: { name: "Fraunces",       stack: "'Fraunces', serif",               note: "warm serif · artisan" },
+  playfair: { name: "Playfair",       stack: "'Playfair Display', serif",       note: "elegant serif · classic" },
+};
+const FONT_ORDER = ["inter", "poppins", "manrope", "jakarta", "grotesk", "dmsans", "fraunces", "playfair"];
+
 // Sample cafe content
 const SAMPLE = {
   Coffee:   [["Espresso","₱90"],["Cappuccino","₱130"],["Latte","₱140"],["Americano","₱110"],["Mocha","₱150"],["Cold Brew","₱160"]],
@@ -56,6 +70,7 @@ const DEFAULT_CONFIG = {
   preset: "counter",
   device: "tablet",
   palette: "coffee",
+  font: "inter",
   business: "Juan's Café",
   initials: "JC",
   tabs: ["Coffee", "Tea", "Pastries", "Specials"],
@@ -71,4 +86,4 @@ const DEFAULT_CONFIG = {
   selected: "menu",
 };
 
-Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG });
+Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG });

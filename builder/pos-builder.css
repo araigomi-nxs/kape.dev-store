@@ -1,6 +1,6 @@
 /* ===================== POS Builder ===================== */
 /* Re-skinned to match the kape.dev store design system. */
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 :root{
   --espresso:#000000;     /* app background */
@@ -145,6 +145,18 @@ a.logo:hover .mark{background:var(--bean-soft);}
   white-space:nowrap;color:var(--cream-dim);opacity:0;transition:.1s;pointer-events:none;z-index:2;}
 .sw:hover .nm{opacity:1;}
 
+/* typeface picker */
+.fontlist{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.fontchip{padding:9px 11px;border-radius:9px;background:var(--panel-2);border:1px solid var(--hair-2);
+  text-align:left;color:var(--cream-dim);transition:.12s;cursor:pointer;display:block;}
+.fontchip:hover{color:var(--cream);border-color:var(--cream-mute);}
+.fontchip.on{border-color:var(--bean);background:var(--panel-3);color:var(--cream);}
+.fontchip .fnm{display:block;font-size:14.5px;font-weight:600;line-height:1.1;}
+.fontchip .fpv{display:block;font-size:12.5px;margin-top:3px;opacity:.85;line-height:1.2;}
+.fontchip .fnote{display:block;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--cream-mute);margin-top:6px;}
+.fontchip.on .fnote{color:var(--bean);}
+
 .chips{display:flex;flex-wrap:wrap;gap:7px;}
 .chip{font-family:var(--font-ui);font-weight:500;font-size:12.5px;padding:7px 11px;border-radius:8px;
   background:var(--panel-2);border:1px solid var(--hair-2);color:var(--cream-dim);transition:.12s;display:flex;align-items:center;gap:7px;}
@@ -199,7 +211,7 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 .pos-bezel{position:absolute;inset:-14px;border-radius:26px;background:#0a0a0a;box-shadow:0 30px 60px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);}
 .pos-bezel.portrait{inset:-16px -13px;}
 .pos{position:relative;width:100%;height:100%;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;
-  font-family:var(--font-ui);color:var(--pos-text);background:var(--pos-bg);box-shadow:0 0 0 1px rgba(0,0,0,.2);}
+  font-family:var(--pos-font,var(--font-ui));color:var(--pos-text);background:var(--pos-bg);box-shadow:0 0 0 1px rgba(0,0,0,.2);}
 
 .pos-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--pos-surface);
   border-bottom:1px solid var(--pos-line);flex:none;}

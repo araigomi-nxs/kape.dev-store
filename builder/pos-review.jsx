@@ -4,6 +4,7 @@ function buildSpec(cfg) {
   const pal = window.PALETTES[cfg.palette];
   const dev = window.DEVICES[cfg.device];
   const preset = window.PRESETS[cfg.preset];
+  const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const cartMap = { right: "Right side", left: "Left side", bottom: "Bottom bar", none: "Hidden" };
   const sideCart = cfg.cart === "right" || cfg.cart === "left";
   const proportions = [
@@ -23,6 +24,7 @@ function buildSpec(cfg) {
       { k: "Layout", v: <span>{preset.name} <span style={{ color: "var(--cream-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}>· {preset.tagline}</span></span> },
       { k: "Device", v: `${dev.name} (${dev.w}×${dev.h})` },
       { k: "Colour", v: <span><span className="dotc" style={{ background: pal.accent }} />{pal.name} · {pal.accent}</span> },
+      { k: "Typeface", v: <span style={{ fontFamily: font.stack }}>{font.name} <span style={{ color: "var(--cream-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}>· {font.note}</span></span> },
       { k: "Order cart", v: cartMap[cfg.cart] },
       { k: "Menu", v: menuDesc },
       { k: "Proportions", v: proportions },
@@ -32,11 +34,11 @@ function buildSpec(cfg) {
       { k: "Business", v: cfg.business || "—" },
       { k: "Logo", v: `Initials "${cfg.initials}" (file to follow)` },
     ],
-    text: specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc),
+    text: specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc, font),
   };
 }
 
-function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc) {
+function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc, font) {
   return [
     "kape.dev — CUSTOM POS COMMISSION SPEC",
     "=====================================",
@@ -44,6 +46,7 @@ function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, 
     `Layout preset : ${preset.name} (${preset.tagline})`,
     `Device        : ${dev.name} — ${dev.w}x${dev.h}`,
     `Colour theme  : ${pal.name} (accent ${pal.accent}, bg ${pal.bg})`,
+    `Typeface      : ${font.name} (${font.stack})`,
     `Order cart    : ${cartMap[cfg.cart]}`,
     `Menu layout   : ${menuDesc}`,
     `Proportions   : ${proportions}`,
