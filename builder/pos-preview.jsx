@@ -206,7 +206,17 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
           {/* header */}
           <Zone id="header" picked={cfg.selected === "header"} pickMode={pickMode} onPick={onPick} tag="header" style={{ flex: "none" }}>
             <div className="pos-header">
-              <div className="pos-logo">{cfg.initials || "·"}</div>
+              {(() => {
+                const b = Math.max(30, Math.min(56, Math.round((cfg.logoSize ?? 46) * 0.82)));
+                return (
+                  <div className={"pos-logo" + (cfg.logo ? " has-img" : "")}
+                    style={cfg.logo ? { width: b, height: b, background: "transparent" } : undefined}>
+                    {cfg.logo
+                      ? <img src={cfg.logo} alt="logo" style={{ width: b, height: b, objectFit: "contain", borderRadius: "inherit", display: "block" }} />
+                      : (cfg.initials || "·")}
+                  </div>
+                );
+              })()}
               <div className="pos-brand">{cfg.business || "Your Business"}
                 <small>// powered by kape.dev</small></div>
               <div className="pos-headright">

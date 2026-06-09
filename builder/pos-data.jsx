@@ -105,6 +105,8 @@ const DEFAULT_CONFIG = {
   receipt: RECEIPT_DEFAULTS,
   business: "Juan's Café",
   initials: "JC",
+  logo: null,       // uploaded logo as a downscaled data-URL (overrides initials when set)
+  logoSize: 46,     // displayed logo height on the receipt (px); header scales from this
   tabs: ["Coffee", "Tea", "Pastries", "Specials"],
   sections: { header: true, tabs: true, menu: true, cart: true, notes: false, pay: true },
   cart: "right",   // overrides preset cart when user repositions

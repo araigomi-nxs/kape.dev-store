@@ -407,6 +407,23 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 .rcpt-qr i.on{background:#1b1b1b;}
 .rcpt-qrcap{color:#777;font-size:9.5px;letter-spacing:.04em;}
 
+/* uploaded logo — inspector control */
+.logo-up{display:flex;align-items:center;gap:13px;}
+.logo-prev{width:56px;height:56px;flex:none;border-radius:12px;background:var(--panel-2);
+  border:1px solid var(--hair-2);display:grid;place-items:center;overflow:hidden;}
+.logo-prev img{width:100%;height:100%;object-fit:contain;}
+.logo-ph{font-family:var(--font-ui);font-weight:800;font-size:18px;color:var(--cream-mute);}
+.logo-acts{display:flex;flex-direction:column;gap:7px;}
+.logo-acts .btn{padding:7px 13px;font-size:12px;justify-content:center;}
+
+/* uploaded logo — POS header (square mark slot) */
+.pos-logo.has-img{background:transparent;}
+.pos-logo img{width:100%;height:100%;object-fit:contain;border-radius:inherit;}
+
+/* uploaded logo — receipt (natural width, fixed height) */
+.rcpt-logo.has-img{width:auto;height:46px;max-width:78%;border-radius:4px;}
+.rcpt-logo img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block;}
+
 /* responsive: collapse panels on narrow */
 @media (max-width:1080px){
   .panel-col{width:210px;}

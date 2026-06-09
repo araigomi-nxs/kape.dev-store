@@ -55,8 +55,13 @@ function ReceiptPreview({ cfg, compact }) {
           {/* logo + business name */}
           {el.logo && (
             <div className="rcpt-head">
-              <div className="rcpt-logo" style={{ background: pal.accent, fontFamily: font.stack }}>
-                {cfg.initials || "·"}
+              <div className={"rcpt-logo" + (cfg.logo ? " has-img" : "")}
+                style={cfg.logo
+                  ? { height: "auto", width: "auto", borderRadius: 4, background: "transparent" }
+                  : { background: pal.accent, fontFamily: font.stack }}>
+                {cfg.logo
+                  ? <img src={cfg.logo} alt="logo" style={{ height: cfg.logoSize ?? 46, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }} />
+                  : (cfg.initials || "·")}
               </div>
               <div className="rcpt-biz" style={{ fontFamily: font.stack }}>{cfg.business || "Your Business"}</div>
             </div>
@@ -198,6 +203,7 @@ function ReceiptInspector({ cfg, set }) {
         {/* store details */}
         <div className="insp-sec">
           <span className="mono">Store details</span>
+          <div style={{ marginBottom: 14 }}><LogoField cfg={cfg} set={set} /></div>
           <label className="field" style={{ marginBottom: 12 }}>
             <span className="mono">Address</span>
             <input className="inp" value={r.address} maxLength={48}

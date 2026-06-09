@@ -111,6 +111,71 @@ function LeftPanel({ cfg, set }) {
   );
 }
 
+// ---------------- Shared: logo upload ----------------
+// Reads an image file, downscales it to <= 256px (keeps localStorage small),
+// and stores it as a PNG data-URL in cfg.logo. Used in screen + receipt inspectors.
+function LogoField({ cfg, set }) {
+  const inputRef = useRef(null);
+  const [err, setErr] = useState("");
+
+  const onFile = (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { setErr("Pick an image file"); return; }
+    if (file.size > 6 * 1024 * 1024) { setErr("Image too large (max 6MB)"); return; }
+    setErr("");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 256;
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        cv.getContext("2d").drawImage(img, 0, 0, w, h);
+        try { set.patch({ logo: cv.toDataURL("image/png") }); }
+        catch (_) { setErr("Couldn't process that image"); }
+      };
+      img.onerror = () => setErr("Couldn't read that image");
+      img.src = reader.result;
+    };
+    reader.onerror = () => setErr("Couldn't read that file");
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="field">
+      <span className="mono">Logo image</span>
+      <div className="logo-up">
+        <div className="logo-prev">
+          {cfg.logo
+            ? <img src={cfg.logo} alt="logo" />
+            : <span className="logo-ph">{cfg.initials || "·"}</span>}
+        </div>
+        <div className="logo-acts">
+          <button className="btn ghost" onClick={() => inputRef.current && inputRef.current.click()}>
+            {cfg.logo ? "Replace…" : "↥ Upload logo"}
+          </button>
+          {cfg.logo && <button className="btn ghost" onClick={() => set.patch({ logo: null })}>Remove</button>}
+        </div>
+        <input ref={inputRef} type="file" accept="image/*" hidden onChange={onFile} />
+      </div>
+      {cfg.logo && (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12 }}>
+          <span className="mono" style={{ flex: 1 }}>Logo size</span>
+          <Stepper value={cfg.logoSize ?? 46} min={24} max={120} step={4} suffix="px"
+            onChange={(v) => set.patch({ logoSize: v })} />
+        </div>
+      )}
+      {err && <span className="err-msg">{err}</span>}
+      <div className="hint">PNG/JPG/SVG · shows on the screen header &amp; receipt. We auto-scale it; transparent PNG looks best. No upload? The <b>initials</b> are used instead.</div>
+    </div>
+  );
+}
+
 // ---------------- Right: inspector ----------------
 function Stepper({ value, min, max, step = 1, onChange, suffix }) {
   return (
@@ -272,12 +337,12 @@ function Inspector({ cfg, set }) {
             <input className="inp" value={cfg.business} maxLength={26}
               onChange={(e) => set.patch({ business: e.target.value })} placeholder="e.g. Juan's Café" />
           </label>
-          <label className="field">
+          <label className="field" style={{ marginBottom: 12 }}>
             <span className="mono">Logo initials</span>
             <input className="inp" value={cfg.initials} maxLength={3} style={{ width: 90 }}
               onChange={(e) => set.patch({ initials: e.target.value.toUpperCase() })} placeholder="JC" />
           </label>
-          <div className="hint">Send your real logo file with the commission — we'll drop it in.</div>
+          <LogoField cfg={cfg} set={set} />
         </div>
 
       </div>
@@ -290,4 +355,4 @@ function labelFor(id) {
   return d ? d.label : "—";
 }
 
-Object.assign(window, { TopBar, LeftPanel, Inspector });
+Object.assign(window, { TopBar, LeftPanel, Inspector, LogoField });
