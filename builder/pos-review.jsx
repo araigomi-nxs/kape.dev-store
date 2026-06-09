@@ -19,6 +19,9 @@ function buildSpec(cfg) {
     if (s.id === "cart") return cfg.cart !== "none" && cfg.sections.cart;
     return cfg.sections[s.id];
   }).map((s) => s.label);
+  const rc = cfg.receipt || window.RECEIPT_DEFAULTS;
+  const rcPaper = (window.RECEIPT_PAPERS[rc.paper] || window.RECEIPT_PAPERS["80mm"]).name;
+  const rcBlocks = window.RECEIPT_DEFS.filter((d) => rc.elements && rc.elements[d.id]).map((d) => d.label);
   return {
     rows: [
       { k: "Layout", v: <span>{preset.name} <span style={{ color: "var(--cream-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}>· {preset.tagline}</span></span> },
@@ -33,12 +36,13 @@ function buildSpec(cfg) {
       { k: "Tabs", v: <span>{cfg.tabs.map((t) => <span className="tg" key={t}>{t}</span>)}</span> },
       { k: "Business", v: cfg.business || "—" },
       { k: "Logo", v: `Initials "${cfg.initials}" (file to follow)` },
+      { k: "Receipt", v: <span>{rcPaper} · {rcBlocks.map((b) => <span className="tg" key={b}>{b}</span>)}</span> },
     ],
-    text: specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc, font),
+    text: specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc, font, rc, rcPaper, rcBlocks),
   };
 }
 
-function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc, font) {
+function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, menuDesc, font, rc, rcPaper, rcBlocks) {
   return [
     "kape.dev — CUSTOM POS COMMISSION SPEC",
     "=====================================",
@@ -55,6 +59,17 @@ function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, 
     `Category tabs : ${cfg.tabs.join(", ")}`,
     `Business name : ${cfg.business}`,
     `Logo initials : ${cfg.initials}`,
+    "",
+    "RECEIPT",
+    "-------",
+    `Paper width   : ${rcPaper}`,
+    `Blocks on     : ${rcBlocks.join(", ")}`,
+    `Address       : ${rc.address}`,
+    `Phone         : ${rc.phone}`,
+    `Tax label     : ${rc.taxLabel}`,
+    `Footer        : ${rc.footer}`,
+    `Social handle : ${rc.social}`,
+    `Accent total  : ${rc.accentTotal ? "yes" : "no"}`,
     "",
     "Generated " + new Date().toLocaleString(),
   ].join("\n");
@@ -91,7 +106,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
   const upd = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
   const captureImage = async () => {
-    const node = snapRef.current?.querySelector(".pos-frame");
+    const node = snapRef.current?.querySelector(".pos-frame, .rcpt-capture");
     if (!node || !window.htmlToImage) { toast("Image export unavailable offline — spec downloaded instead"); download("kape-pos-spec.txt", spec.text); return; }
     try {
       setBusy(true);
@@ -123,7 +138,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
         // render + upload a PNG snapshot of the chosen layout (best-effort)
         let snapshot_url = null;
         try {
-          const node = snapRef.current?.querySelector(".pos-frame");
+          const node = snapRef.current?.querySelector(".pos-frame, .rcpt-capture");
           if (node && window.htmlToImage) {
             const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 1.5, backgroundColor: window.PALETTES[cfg.palette].bg });
             const blob = await (await fetch(dataUrl)).blob();
@@ -178,9 +193,15 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
               <div className="review-left">
                 <span className="mono" style={{ display: "block", marginBottom: 10 }}>Layout snapshot</span>
                 <div className="snap-wrap" ref={snapRef} style={{ height: 240 }}>
-                  <POSPreview cfg={{ ...cfg, selected: null }} pickMode={false} onPick={() => {}} compact={true} />
+                  {cfg.canvasMode === "receipt"
+                    ? <ReceiptPreview cfg={cfg} compact={true} />
+                    : <POSPreview cfg={{ ...cfg, selected: null }} pickMode={false} onPick={() => {}} compact={true} />}
                 </div>
-                <div className="snap-cap">{window.DEVICES[cfg.device].name} · {window.PRESETS[cfg.preset].name} · {window.PALETTES[cfg.palette].name}</div>
+                <div className="snap-cap">
+                  {cfg.canvasMode === "receipt"
+                    ? <>Receipt · {(window.RECEIPT_PAPERS[(cfg.receipt || {}).paper] || window.RECEIPT_PAPERS["80mm"]).name} · {window.PALETTES[cfg.palette].name}</>
+                    : <>{window.DEVICES[cfg.device].name} · {window.PRESETS[cfg.preset].name} · {window.PALETTES[cfg.palette].name}</>}
+                </div>
 
                 <div style={{ display: "flex", gap: 9, marginTop: 14 }}>
                   <button className="btn ghost" style={{ flex: 1, justifyContent: "center" }} onClick={captureImage} disabled={busy}>

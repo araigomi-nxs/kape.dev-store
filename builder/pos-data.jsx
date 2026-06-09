@@ -47,6 +47,36 @@ const FONTS = {
 };
 const FONT_ORDER = ["inter", "poppins", "manrope", "jakarta", "grotesk", "dmsans", "fraunces", "playfair"];
 
+// Printed-receipt designer. Reuses brand (name, initials, accent, font) from the top-level config.
+const RECEIPT_PAPERS = {
+  "58mm": { name: "58mm", tagline: "compact roll", w: 230 },
+  "80mm": { name: "80mm", tagline: "standard roll", w: 300 },
+};
+const RECEIPT_PAPER_ORDER = ["58mm", "80mm"];
+
+// Toggleable receipt blocks (top→bottom print order). Locked ones always print.
+const RECEIPT_DEFS = [
+  { id: "logo",    label: "Logo + name",     locked: true  },
+  { id: "contact", label: "Address & phone", locked: false },
+  { id: "meta",    label: "Order details",   locked: false },
+  { id: "items",   label: "Itemized list",   locked: true  },
+  { id: "totals",  label: "Totals & tax",    locked: true  },
+  { id: "payment", label: "Payment line",    locked: false },
+  { id: "footer",  label: "Footer message",  locked: false },
+  { id: "qr",      label: "QR code",         locked: false },
+];
+
+const RECEIPT_DEFAULTS = {
+  paper: "80mm",
+  elements: { logo: true, contact: true, meta: true, items: true, totals: true, payment: true, footer: true, qr: false },
+  address: "123 Brew St., Quezon City",
+  phone: "+63 917 000 0000",
+  taxLabel: "VAT (12%)",
+  footer: "Thank you! Come back soon ☕",
+  social: "@juanscafe",
+  accentTotal: true,
+};
+
 // Sample cafe content
 const SAMPLE = {
   Coffee:   [["Espresso","₱90"],["Cappuccino","₱130"],["Latte","₱140"],["Americano","₱110"],["Mocha","₱150"],["Cold Brew","₱160"]],
@@ -71,6 +101,8 @@ const DEFAULT_CONFIG = {
   device: "tablet",
   palette: "coffee",
   font: "inter",
+  canvasMode: "screen", // screen | receipt
+  receipt: RECEIPT_DEFAULTS,
   business: "Juan's Café",
   initials: "JC",
   tabs: ["Coffee", "Tea", "Pastries", "Specials"],
@@ -86,4 +118,4 @@ const DEFAULT_CONFIG = {
   selected: "menu",
 };
 
-Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG });
+Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, RECEIPT_PAPERS, RECEIPT_PAPER_ORDER, RECEIPT_DEFS, RECEIPT_DEFAULTS, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG });

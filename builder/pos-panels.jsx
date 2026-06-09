@@ -27,26 +27,38 @@ function TopBar({ cfg, set, onExport, onSubmit }) {
       <div className="tb-divider" />
 
       <div className="tb-group">
-        <span className="mono">Preset</span>
+        <span className="mono">View</span>
         <div className="seg">
-          {window.PRESET_ORDER.map((k) => (
-            <button key={k} className={cfg.preset === k ? "on" : ""} onClick={() => set.preset(k)}>
-              {window.PRESETS[k].name}
-            </button>
-          ))}
+          <button className={cfg.canvasMode !== "receipt" ? "on" : ""} onClick={() => set.mode("screen")}>Screen</button>
+          <button className={cfg.canvasMode === "receipt" ? "on" : ""} onClick={() => set.mode("receipt")}>Receipt</button>
         </div>
       </div>
 
-      <div className="tb-group">
-        <span className="mono">Device</span>
-        <div className="seg mini">
-          {window.DEVICE_ORDER.map((k) => (
-            <button key={k} className={cfg.device === k ? "on" : ""} onClick={() => set.patch({ device: k })}>
-              <span className="pg">{window.DEVICES[k].glyph}</span>{window.DEVICES[k].name}
-            </button>
-          ))}
-        </div>
-      </div>
+      {cfg.canvasMode !== "receipt" && (
+        <>
+          <div className="tb-group">
+            <span className="mono">Preset</span>
+            <div className="seg">
+              {window.PRESET_ORDER.map((k) => (
+                <button key={k} className={cfg.preset === k ? "on" : ""} onClick={() => set.preset(k)}>
+                  {window.PRESETS[k].name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="tb-group">
+            <span className="mono">Device</span>
+            <div className="seg mini">
+              {window.DEVICE_ORDER.map((k) => (
+                <button key={k} className={cfg.device === k ? "on" : ""} onClick={() => set.patch({ device: k })}>
+                  <span className="pg">{window.DEVICES[k].glyph}</span>{window.DEVICES[k].name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="grow" />
       <ThemeToggle />

@@ -34,29 +34,49 @@ function App() {
       return { ...c, tabs: [...c.tabs, add], sections: { ...c.sections, tabs: true }, selected: "tabs" };
     }),
     removeTab: (i) => setCfg((c) => c.tabs.length <= 1 ? c : { ...c, tabs: c.tabs.filter((_, j) => j !== i) }),
+    mode: (m) => setCfg((c) => ({ ...c, canvasMode: m })),
+    receipt: (o) => setCfg((c) => ({ ...c, receipt: { ...(c.receipt || window.RECEIPT_DEFAULTS), ...o } })),
+    receiptEl: (id) => setCfg((c) => {
+      const def = window.RECEIPT_DEFS.find((d) => d.id === id);
+      if (def && def.locked) return c;
+      const rc = c.receipt || window.RECEIPT_DEFAULTS;
+      return { ...c, receipt: { ...rc, elements: { ...rc.elements, [id]: !rc.elements[id] } } };
+    }),
   };
 
   const onPick = (id) => set.patch({ selected: id });
 
   const sel = cfg.selected ? (window.SECTION_DEFS.find((s) => s.id === cfg.selected) || {}).label : null;
+  const receiptMode = cfg.canvasMode === "receipt";
 
   return (
     <div className="app">
       <TopBar cfg={cfg} set={set} onExport={() => setModal("export")} onSubmit={() => setModal("submit")} />
       <div className="body">
-        <LeftPanel cfg={cfg} set={set} />
+        {receiptMode ? <ReceiptLayers cfg={cfg} set={set} /> : <LeftPanel cfg={cfg} set={set} />}
 
         <div className="canvas">
           <div className="canvas-top">
-            <span className="pill"><b>{window.PRESETS[cfg.preset].name}</b> · {window.DEVICES[cfg.device].name}</span>
-            <span className="pill">{sel ? <>selected: <b>{sel}</b></> : <>click an element to select →</>}</span>
+            {receiptMode ? (
+              <>
+                <span className="pill"><b>Receipt</b> · {(window.RECEIPT_PAPERS[(cfg.receipt || {}).paper] || window.RECEIPT_PAPERS["80mm"]).name}</span>
+                <span className="pill">printed receipt preview</span>
+              </>
+            ) : (
+              <>
+                <span className="pill"><b>{window.PRESETS[cfg.preset].name}</b> · {window.DEVICES[cfg.device].name}</span>
+                <span className="pill">{sel ? <>selected: <b>{sel}</b></> : <>click an element to select →</>}</span>
+              </>
+            )}
             <div className="grow" />
             <span className="pill">live preview · saves automatically</span>
           </div>
-          <POSPreview cfg={cfg} pickMode={true} onPick={onPick} onResize={set.patch} />
+          {receiptMode
+            ? <ReceiptPreview cfg={cfg} />
+            : <POSPreview cfg={cfg} pickMode={true} onPick={onPick} onResize={set.patch} />}
         </div>
 
-        <Inspector cfg={cfg} set={set} />
+        {receiptMode ? <ReceiptInspector cfg={cfg} set={set} /> : <Inspector cfg={cfg} set={set} />}
       </div>
 
       {modal && <ReviewModal cfg={cfg} mode={modal} onClose={() => setModal(null)} toast={toast} />}
