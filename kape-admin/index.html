@@ -70,6 +70,17 @@
     .pal-dot { width:12px; height:12px; border-radius:3px; box-shadow:inset 0 0 0 1px rgba(128,128,128,.35); }
     .comm-extra { font-family:var(--mono); font-size:.66rem; color:var(--muted-light); margin-top:10px; }
     .comm-extra i { color:var(--accent); margin-right:6px; }
+    .comm-snap, .comm-logo { cursor:zoom-in; transition:border-color .15s; }
+    .comm-snap:hover, .comm-logo:hover { border-color:var(--accent); }
+
+    /* lightbox */
+    .lb { position:fixed; inset:0; z-index:100; display:none; flex-direction:column; align-items:center; justify-content:center;
+          gap:16px; padding:24px; background:rgba(0,0,0,.88); backdrop-filter:blur(6px); }
+    .lb.open { display:flex; }
+    .lb-bar { display:flex; gap:10px; }
+    .lb-img { max-width:92vw; max-height:80vh; border-radius:10px; border:1px solid var(--card-border);
+              background:var(--off-black); box-shadow:0 24px 70px rgba(0,0,0,.6); image-rendering:auto; }
+    .lb-cap { font-family:var(--mono); font-size:.66rem; color:var(--muted-light); }
     .comm-notes { font-size:.85rem; color:var(--white); margin-top:10px; line-height:1.6; }
     .comm-foot { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; }
     .comm-foot select { width:auto; padding:7px 10px; font-size:.78rem; }
@@ -245,6 +256,16 @@
         <div id="commList"></div>
       </div>
     </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lb">
+    <div class="lb-bar">
+      <button class="btn btn-primary" id="lbDownload"><i class="fas fa-download"></i> Download</button>
+      <button class="btn btn-ghost" id="lbClose"><i class="fas fa-times"></i> Close</button>
+    </div>
+    <img id="lbImg" class="lb-img" src="" alt="Preview">
+    <div class="lb-cap" id="lbCap"></div>
   </div>
 
   <script>
@@ -537,8 +558,8 @@
           ${swatchRow(c.custom_palette)}
           ${receiptSummary(c.receipt)}
           ${(logo || c.snapshot_url)?`<div class="comm-media">
-            ${logo?`<a href="${esc(logo)}" target="_blank" rel="noopener" title="Customer logo"><img class="comm-logo" src="${esc(logo)}" alt="Logo"></a>`:''}
-            ${c.snapshot_url?`<a href="${esc(c.snapshot_url)}" target="_blank" rel="noopener" title="Open full snapshot"><img class="comm-snap" src="${esc(c.snapshot_url)}" alt="Layout snapshot"></a>`:''}
+            ${logo?`<img class="comm-logo" src="${esc(logo)}" alt="Logo" title="Click to enlarge & download" onclick="openLightbox(this.src, 'kape-logo-${esc(c.id)}.png')">`:''}
+            ${c.snapshot_url?`<img class="comm-snap" src="${esc(c.snapshot_url)}" alt="Layout snapshot" title="Click to enlarge & download" onclick="openLightbox(this.src, 'kape-pos-${esc(c.id)}.png')">`:''}
           </div>`:''}
           ${c.notes?`<div class="comm-notes">“${esc(c.notes)}”</div>`:''}
           ${c.spec?`<details><summary class="muted" style="cursor:pointer;margin-top:12px;font-family:var(--mono);font-size:.72rem;">View full spec</summary><div class="comm-spec">${esc(c.spec)}</div></details>`:''}
@@ -562,6 +583,32 @@
       if(error){ alert(error.message); return; }
       loadCommissions();
     };
+
+    // ---- LIGHTBOX (click snapshot/logo to view large + download clean) ----
+    let _lbState = { src:'', name:'image.png' };
+    window.openLightbox = (src, name) => {
+      if(!src) return;
+      _lbState = { src, name: name || 'image.png' };
+      $('lbImg').src = src;
+      $('lbCap').textContent = name || '';
+      $('lightbox').classList.add('open');
+    };
+    function closeLightbox(){ $('lightbox').classList.remove('open'); $('lbImg').src=''; }
+    $('lbClose').addEventListener('click', closeLightbox);
+    $('lightbox').addEventListener('click', e => { if(e.target === $('lightbox')) closeLightbox(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+    $('lbDownload').addEventListener('click', async () => {
+      const { src, name } = _lbState;
+      try {
+        const res = await fetch(src);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch(err) {
+        window.open(src, '_blank');   // fallback if CORS blocks the fetch
+      }
+    });
 
     sb.auth.onAuthStateChange((_e,_s)=>{}); // keep session in sync
     refresh();

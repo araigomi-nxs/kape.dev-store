@@ -140,7 +140,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
         try {
           const node = snapRef.current?.querySelector(".pos-frame, .rcpt-capture");
           if (node && window.htmlToImage) {
-            const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 1.5, backgroundColor: window.resolvePalette(cfg).bg });
+            const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: window.resolvePalette(cfg).bg });
             const blob = await (await fetch(dataUrl)).blob();
             const fname = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`;
             const up = await sb.storage.from("commission-snapshots").upload(fname, blob, { contentType: "image/png", upsert: false });
