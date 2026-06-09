@@ -81,8 +81,8 @@ function App() {
               </>
             ) : (
               <>
-                <span className="pill"><b>{cfg.skin === "boutique" ? "Boutique" : window.PRESETS[cfg.preset].name}</b> · {window.DEVICES[cfg.device].name}</span>
-                <span className="pill">{cfg.skin === "boutique" ? <>ready-made design · edit theme &amp; font →</> : sel ? <>selected: <b>{sel}</b></> : <>click an element to select →</>}</span>
+                <span className="pill"><b>{cfg.skin && window.SKINS[cfg.skin] ? (cfg.skin[0].toUpperCase() + cfg.skin.slice(1)) : window.PRESETS[cfg.preset].name}</b> · {window.DEVICES[cfg.device].name}</span>
+                <span className="pill">{cfg.skin && window.SKINS[cfg.skin] ? <>ready-made design · edit theme &amp; font →</> : sel ? <>selected: <b>{sel}</b></> : <>click an element to select →</>}</span>
               </>
             )}
             <div className="grow" />

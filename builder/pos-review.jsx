@@ -100,7 +100,8 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
   const spec = buildSpec(cfg);
   const snapRef = useRef(null);
   const capRef = useRef(null); // hidden full-size boutique render — captured at natural width
-  const isBoutique = cfg.skin === "boutique" && cfg.canvasMode !== "receipt";
+  const isSkin = cfg.skin && window.SKINS[cfg.skin] && cfg.canvasMode !== "receipt";
+  const skinName = cfg.skin ? cfg.skin[0].toUpperCase() + cfg.skin.slice(1) : "";
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ name: "", business: cfg.business || "", email: "", contact: "", notes: "" });
@@ -110,8 +111,8 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
   // boutique is responsive — capture a dedicated full-width node so the layout
   // doesn't collapse; everything else captures the scaled device screen.
   const captureNode = () =>
-    (isBoutique && capRef.current && capRef.current.querySelector(".bq")) ||
-    (snapRef.current && snapRef.current.querySelector(".pos, .bq, .rcpt-capture"));
+    (isSkin && capRef.current && capRef.current.querySelector(".skin-screen")) ||
+    (snapRef.current && snapRef.current.querySelector(".pos, .skin-screen, .rcpt-capture"));
 
   const captureImage = async () => {
     // capture the full device-resolution screen (.pos), not the scaled-down frame, for a crisp PNG
@@ -217,23 +218,23 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
               {/* left: snapshot */}
               <div className="review-left">
                 <span className="mono" style={{ display: "block", marginBottom: 10 }}>Layout snapshot</span>
-                <div className={"snap-wrap" + (cfg.skin === "boutique" && cfg.canvasMode !== "receipt" ? " custom" : "")} ref={snapRef} style={{ height: 240 }}>
+                <div className={"snap-wrap" + (isSkin ? " custom" : "")} ref={snapRef} style={{ height: 240 }}>
                   {cfg.canvasMode === "receipt"
                     ? <ReceiptPreview cfg={cfg} compact={true} />
-                    : cfg.skin === "boutique"
-                      ? <FitBox><BoutiqueLive cfg={{ ...cfg, selected: null }} /></FitBox>
+                    : isSkin
+                      ? <FitBox><SkinView cfg={{ ...cfg, selected: null }} /></FitBox>
                       : <POSPreview cfg={{ ...cfg, selected: null }} pickMode={false} onPick={() => {}} compact={true} />}
                 </div>
-                {isBoutique && (
+                {isSkin && (
                   <div ref={capRef} aria-hidden="true"
                     style={{ position: "fixed", left: -99999, top: 0, width: 1040, pointerEvents: "none" }}>
-                    <BoutiqueLive cfg={{ ...cfg, selected: null }} />
+                    <SkinView cfg={{ ...cfg, selected: null }} />
                   </div>
                 )}
                 <div className="snap-cap">
                   {cfg.canvasMode === "receipt"
                     ? <>Receipt · {(window.RECEIPT_PAPERS[(cfg.receipt || {}).paper] || window.RECEIPT_PAPERS["80mm"]).name} · {window.resolvePalette(cfg).name}</>
-                    : <>{window.DEVICES[cfg.device].name} · {isBoutique ? "Boutique" : window.PRESETS[cfg.preset].name} · {window.resolvePalette(cfg).name}</>}
+                    : <>{window.DEVICES[cfg.device].name} · {isSkin ? skinName : window.PRESETS[cfg.preset].name} · {window.resolvePalette(cfg).name}</>}
                 </div>
 
                 <div style={{ display: "flex", gap: 9, marginTop: 14 }}>
@@ -320,7 +321,7 @@ function ReadyMadeModal({ cfg, set, onClose, toast }) {
         <div className="modal-body rm-body">
           <div className={"snap-wrap rm-snap" + (custom ? " custom" : "")}>
             {custom
-              ? <FitBox><BoutiqueLive cfg={previewCfg} /></FitBox>
+              ? <FitBox><SkinView cfg={previewCfg} /></FitBox>
               : <POSPreview cfg={previewCfg} pickMode={false} onPick={() => {}} compact={true} />}
           </div>
         </div>
@@ -328,8 +329,13 @@ function ReadyMadeModal({ cfg, set, onClose, toast }) {
         <div className="modal-foot">
           <span className="note">// {t.name} — {t.tagline}</span>
           <div className="grow" />
+          {keys.length > 1 && (
+            <button className="btn ghost" onClick={() => setIdx((i) => (i - 1 + keys.length) % keys.length)}>← Previous</button>
+          )}
           <button className="btn ghost" onClick={() => { set.applyTemplate(k); toast(t.name + " applied — customize away"); onClose(); }}>Customize it</button>
-          <button className="btn solid" onClick={() => setIdx((i) => (i + 1) % keys.length)}>Next →</button>
+          {keys.length > 1 && (
+            <button className="btn solid" onClick={() => setIdx((i) => (i + 1) % keys.length)}>Next →</button>
+          )}
         </div>
       </div>
     </div>

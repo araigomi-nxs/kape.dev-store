@@ -76,8 +76,22 @@ const TEMPLATES = {
       sections: { header: true, search: true, tabs: true, menu: true, cart: true, notes: false, pay: true },
     },
   },
+  terminal: {
+    name: "Terminal",
+    tagline: "product grid · order ticket · mono",
+    cfg: {
+      skin: "terminal",
+      preset: "counter", cart: "right", menuCols: 3, menuLayout: "grid",
+      palette: "custom",
+      customPalette: { accent: "#6d5efc", bg: "#f5f6fa", surface: "#ffffff", text: "#1b1f2a" },
+      font: "grotesk",
+      radiusPanel: 10, radiusCard: 10, radiusButton: 8,
+      tabs: ["Tea", "Pastries", "Coffee", "Juices", "Snacks"],
+      sections: { header: true, search: false, tabs: true, menu: true, cart: true, notes: false, pay: true },
+    },
+  },
 };
-const TEMPLATE_ORDER = ["boutique"];
+const TEMPLATE_ORDER = ["boutique", "terminal"];
 
 const DEVICES = {
   tablet:  { name: "Tablet",  w: 1024, h: 768, glyph: "▭", portrait: false },

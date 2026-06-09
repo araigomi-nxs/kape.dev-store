@@ -209,7 +209,7 @@ function BoutiqueLive({ cfg }) {
     </div>
   );
   return (
-    <div className="bq" style={vars}>
+    <div className="bq skin-screen" style={vars}>
       <div className="bq-header">
         <div className={"bq-logo" + (cfg.logo ? " has-img" : "")}>
           {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
@@ -251,11 +251,109 @@ function BoutiqueLive({ cfg }) {
   );
 }
 
+// ---- Terminal skin ----------------------------------------------------------
+// A precise "counter terminal" design: product grid with SKU IDs + mono specs,
+// and an order ticket with subtotal/tax + park/checkout. Palette/font/corner
+// driven, so it stays customizable and matches across modal + canvas.
+function TerminalLive({ cfg }) {
+  const pal = window.resolvePalette(cfg);
+  const font = window.FONTS[cfg.font] || window.FONTS.inter;
+  const accent = pal.accent;
+  const surface = pal.surface;
+  const mix = (c, pct, base) => `color-mix(in srgb, ${c} ${pct}%, ${base})`;
+  const tabs = (cfg.tabs || []).slice(0, 5);
+  const vars = {
+    "--cp-accent": accent,
+    "--cp-on-accent": pal.onAccent || window.onAccentFor(accent),
+    "--cp-text": pal.text,
+    "--cp-sub": pal.sub,
+    "--cp-line": pal.line,
+    "--cp-surface": surface,
+    "--cp-bg": pal.bg,
+    "--cp-soft": mix(accent, 14, surface),
+    "--cp-chip": mix(accent, 7, surface),
+    "--cp-r-card": (cfg.radiusCard ?? 10) + "px",
+    "--cp-r-btn": (cfg.radiusButton ?? 8) + "px",
+    "--cp-r-panel": (cfg.radiusPanel ?? 10) + "px",
+    fontFamily: font.stack,
+  };
+  const items = [
+    { id: "T-001", ic: "🍵", name: "Hot Green Tea", spec: "250ml / steamed", price: "$4.50" },
+    { id: "T-005", ic: "🧋", name: "Milk Tea", spec: "500ml / ice 50%", price: "$6.25", on: true },
+    { id: "T-012", ic: "🍵", name: "Matcha", spec: "ceremonial grade", price: "$5.75" },
+    { id: "T-007", ic: "🫖", name: "Earl Grey", spec: "bergamot infusion", price: "$4.00" },
+    { id: "T-003", ic: "🌼", name: "Chamomile", spec: "decaf / calm", price: "$4.25" },
+    { id: "T-006", ic: "🌸", name: "Jasmine", spec: "floral / green", price: "$4.50" },
+    { id: "T-009", ic: "🍂", name: "Oolong", spec: "roasted / smooth", price: "$4.75" },
+    { id: "T-011", ic: "🌺", name: "Hibiscus", spec: "tart / vitamin c", price: "$4.50" },
+    { id: "T-014", ic: "🌿", name: "Lemongrass", spec: "citrus / herbal", price: "$4.00" },
+  ];
+  return (
+    <div className="cp skin-screen" style={vars}>
+      <div className="cp-header">
+        <div className={"cp-logo" + (cfg.logo ? " has-img" : "")}>
+          {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
+        </div>
+        <div className="cp-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
+        <div className="cp-headright"><span className="cp-clock">09:41 AM</span><span className="cp-avatar" /></div>
+      </div>
+      <div className="cp-body">
+        <div className="cp-main">
+          <div className="cp-tabs">
+            {tabs.map((t, i) => (<span className={"cp-tab" + (i === 0 ? " on" : "")} key={t + i}>{t}</span>))}
+          </div>
+          <div className="cp-grid">
+            {items.map((it, i) => (
+              <div className={"cp-card" + (it.on ? " on" : "")} key={i}>
+                <span className="cp-id">ID: {it.id}</span>
+                <div className="cp-thumb">{it.ic}</div>
+                <div className="cp-nm">{it.name}</div>
+                <div className="cp-cardfoot"><span className="cp-spec">{it.spec}</span><span className="cp-price">{it.price}</span></div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="cp-side">
+          <div className="cp-side-head"><h3>Current Order</h3><span className="cp-meta">TS_ID 9926-6A · TABLE 12</span></div>
+          <div className="cp-ticket">
+            <div className="cp-tline">
+              <span className="cp-q">2x</span>
+              <div className="cp-tinfo"><span className="cp-tnm">Milk Tea</span><span className="cp-tadd">+ large cup · + boba pearls</span></div>
+              <span className="cp-tpr">$12.50</span>
+            </div>
+            <div className="cp-tline">
+              <span className="cp-q">1x</span>
+              <div className="cp-tinfo"><span className="cp-tnm">Matcha</span><span className="cp-tadd">+ oat milk</span></div>
+              <span className="cp-tpr">$5.75</span>
+            </div>
+          </div>
+          <div className="cp-totals">
+            <div className="cp-trow"><span>Subtotal</span><span>$18.25</span></div>
+            <div className="cp-trow"><span>Tax (8%)</span><span>$1.46</span></div>
+            <div className="cp-trow tot"><span>Total</span><span>$19.71</span></div>
+          </div>
+          <div className="cp-actions">
+            <div className="cp-park">Park order</div>
+            <div className="cp-checkout">🛒 Checkout</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// skin registry — maps cfg.skin → component (classic = generic builder preview)
+const SKINS = { boutique: BoutiqueLive, terminal: TerminalLive };
+function SkinView({ cfg }) {
+  const C = SKINS[cfg.skin];
+  return C ? <C cfg={cfg} /> : null;
+}
+
 function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
-  if (cfg.skin === "boutique") {
+  if (cfg.skin && SKINS[cfg.skin]) {
     return (
-      <div className="canvas-stage bq-stage" style={compact ? { padding: 0, width: "100%", height: "100%" } : undefined}>
-        <BoutiqueLive cfg={cfg} />
+      <div className="canvas-stage skin-stage" style={compact ? { padding: 0, width: "100%", height: "100%" } : undefined}>
+        <SkinView cfg={cfg} />
       </div>
     );
   }
@@ -399,4 +497,4 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   );
 }
 
-Object.assign(window, { POSPreview, BoutiqueLive, FitBox, useFit });
+Object.assign(window, { POSPreview, BoutiqueLive, TerminalLive, SKINS, SkinView, FitBox, useFit });
