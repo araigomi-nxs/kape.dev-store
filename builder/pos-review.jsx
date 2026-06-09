@@ -26,7 +26,7 @@ function buildSpec(cfg) {
     rows: [
       { k: "Layout", v: <span>{preset.name} <span style={{ color: "var(--cream-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}>· {preset.tagline}</span></span> },
       { k: "Device", v: `${dev.name} (${dev.w}×${dev.h})` },
-      { k: "Colour", v: <span><span className="dotc" style={{ background: pal.accent }} />{pal.name} · {pal.accent}</span> },
+      { k: "Colour", v: <span><span className="dotc" style={{ background: pal.accent }} />{pal.name} · {pal.accent}{pal.custom && <span style={{ color: "var(--cream-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}> · bg {pal.bg} · text {pal.text}</span>}</span> },
       { k: "Typeface", v: <span style={{ fontFamily: font.stack }}>{font.name} <span style={{ color: "var(--cream-mute)", fontFamily: "var(--font-mono)", fontSize: 11 }}>· {font.note}</span></span> },
       { k: "Order cart", v: cartMap[cfg.cart] },
       { k: "Menu", v: menuDesc },
@@ -49,7 +49,7 @@ function specText(cfg, pal, dev, preset, cartMap, onSecs, proportions, corners, 
     "",
     `Layout preset : ${preset.name} (${preset.tagline})`,
     `Device        : ${dev.name} — ${dev.w}x${dev.h}`,
-    `Colour theme  : ${pal.name} (accent ${pal.accent}, bg ${pal.bg})`,
+    `Colour theme  : ${pal.name} (accent ${pal.accent}, bg ${pal.bg}, surface ${pal.surface}, text ${pal.text})`,
     `Typeface      : ${font.name} (${font.stack})`,
     `Order cart    : ${cartMap[cfg.cart]}`,
     `Menu layout   : ${menuDesc}`,
@@ -148,6 +148,18 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
           }
         } catch (_) { /* snapshot is optional — keep going */ }
 
+        // upload the customer's logo image to storage (best-effort)
+        let logo_url = null;
+        try {
+          if (cfg.logo && cfg.logo.startsWith("data:")) {
+            const blob = await (await fetch(cfg.logo)).blob();
+            const ext = (blob.type.split("/")[1] || "png").replace("+xml", "");
+            const fname = `logo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const up = await sb.storage.from("commission-snapshots").upload(fname, blob, { contentType: blob.type || "image/png", upsert: false });
+            if (!up.error) logo_url = sb.storage.from("commission-snapshots").getPublicUrl(fname).data.publicUrl;
+          }
+        } catch (_) { /* logo is optional — keep going */ }
+
         const { error } = await sb.from("commissions").insert({
           name: form.name.trim(),
           business: form.business.trim() || null,
@@ -157,9 +169,13 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
           preset: window.PRESETS[cfg.preset]?.name || null,
           device: window.DEVICES[cfg.device]?.name || null,
           palette: window.resolvePalette(cfg)?.name || null,
+          font: (window.FONTS[cfg.font] || window.FONTS.inter).name,
+          custom_palette: cfg.palette === "custom" ? (cfg.customPalette || window.DEFAULT_CUSTOM) : null,
+          receipt: cfg.receipt || window.RECEIPT_DEFAULTS,
           spec: spec.text,
           design: cfg,
           snapshot_url,
+          logo_url,
         });
         if (error) throw error;
       } else {
