@@ -35,6 +35,13 @@ function App() {
     }),
     removeTab: (i) => setCfg((c) => c.tabs.length <= 1 ? c : { ...c, tabs: c.tabs.filter((_, j) => j !== i) }),
     mode: (m) => setCfg((c) => ({ ...c, canvasMode: m })),
+    useCustom: () => setCfg((c) => {
+      if (c.palette === "custom") return c;
+      const p = window.PALETTES[c.palette] || window.PALETTES.coffee;
+      const seed = c.customPalette || { accent: p.accent, bg: p.bg, surface: p.surface, text: p.text };
+      return { ...c, palette: "custom", customPalette: seed };
+    }),
+    customColor: (k, v) => setCfg((c) => ({ ...c, palette: "custom", customPalette: { ...(c.customPalette || window.DEFAULT_CUSTOM), [k]: v } })),
     receipt: (o) => setCfg((c) => ({ ...c, receipt: { ...(c.receipt || window.RECEIPT_DEFAULTS), ...o } })),
     receiptEl: (id) => setCfg((c) => {
       const def = window.RECEIPT_DEFS.find((d) => d.id === id);

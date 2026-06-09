@@ -1,7 +1,7 @@
 // ============ POS Builder · review + capture ============
 
 function buildSpec(cfg) {
-  const pal = window.PALETTES[cfg.palette];
+  const pal = window.resolvePalette(cfg);
   const dev = window.DEVICES[cfg.device];
   const preset = window.PRESETS[cfg.preset];
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
@@ -110,7 +110,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
     if (!node || !window.htmlToImage) { toast("Image export unavailable offline — spec downloaded instead"); download("kape-pos-spec.txt", spec.text); return; }
     try {
       setBusy(true);
-      const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: window.PALETTES[cfg.palette].bg });
+      const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: window.resolvePalette(cfg).bg });
       const a = document.createElement("a"); a.href = dataUrl; a.download = "kape-pos-layout.png"; a.click();
       toast("Layout image downloaded");
     } catch (e) { toast("Couldn't render image — try the spec download"); }
@@ -140,7 +140,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
         try {
           const node = snapRef.current?.querySelector(".pos-frame, .rcpt-capture");
           if (node && window.htmlToImage) {
-            const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 1.5, backgroundColor: window.PALETTES[cfg.palette].bg });
+            const dataUrl = await window.htmlToImage.toPng(node, { pixelRatio: 1.5, backgroundColor: window.resolvePalette(cfg).bg });
             const blob = await (await fetch(dataUrl)).blob();
             const fname = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`;
             const up = await sb.storage.from("commission-snapshots").upload(fname, blob, { contentType: "image/png", upsert: false });
@@ -156,7 +156,7 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
           notes: form.notes.trim() || null,
           preset: window.PRESETS[cfg.preset]?.name || null,
           device: window.DEVICES[cfg.device]?.name || null,
-          palette: window.PALETTES[cfg.palette]?.name || null,
+          palette: window.resolvePalette(cfg)?.name || null,
           spec: spec.text,
           design: cfg,
           snapshot_url,
@@ -199,8 +199,8 @@ function ReviewModal({ cfg, mode, onClose, toast }) {
                 </div>
                 <div className="snap-cap">
                   {cfg.canvasMode === "receipt"
-                    ? <>Receipt · {(window.RECEIPT_PAPERS[(cfg.receipt || {}).paper] || window.RECEIPT_PAPERS["80mm"]).name} · {window.PALETTES[cfg.palette].name}</>
-                    : <>{window.DEVICES[cfg.device].name} · {window.PRESETS[cfg.preset].name} · {window.PALETTES[cfg.palette].name}</>}
+                    ? <>Receipt · {(window.RECEIPT_PAPERS[(cfg.receipt || {}).paper] || window.RECEIPT_PAPERS["80mm"]).name} · {window.resolvePalette(cfg).name}</>
+                    : <>{window.DEVICES[cfg.device].name} · {window.PRESETS[cfg.preset].name} · {window.resolvePalette(cfg).name}</>}
                 </div>
 
                 <div style={{ display: "flex", gap: 9, marginTop: 14 }}>

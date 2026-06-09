@@ -16,6 +16,37 @@ const PALETTES = {
   olivedark:{ name: "Olive Dark",dark: true, accent: "#c9c06a", bg: "#16150d", surface: "#201f14", text: "#eee9d4", sub: "#9b9670", line: "#33301f" },
 };
 
+// ---- Custom theme support ----
+// Users pick 4 colours (accent/bg/surface/text); sub, line and the on-accent
+// text colour are derived so every custom theme stays readable.
+function _hx(h) { h = (h || "").replace("#", ""); if (h.length === 3) h = h.split("").map((c) => c + c).join(""); const n = parseInt(h || "0", 16) || 0; return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function _toHx(r, g, b) { const c = (x) => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, "0"); return "#" + c(r) + c(g) + c(b); }
+function _mix(a, b, t) { const A = _hx(a), B = _hx(b); return _toHx(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, A[2] + (B[2] - A[2]) * t); }
+function _lum(hex) { const p = _hx(hex).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]; }
+function contrastRatio(a, b) { const l1 = _lum(a), l2 = _lum(b), hi = Math.max(l1, l2), lo = Math.min(l1, l2); return (hi + 0.05) / (lo + 0.05); }
+function onAccentFor(accent) { return _lum(accent) > 0.5 ? "#171717" : "#ffffff"; }
+
+const DEFAULT_CUSTOM = { accent: "#b9743b", bg: "#f4ede2", surface: "#fffaf3", text: "#2a2018" };
+
+// Expand the 4 user colours into the full palette shape (+ derived fields).
+function buildCustom(c) {
+  const cp = c || DEFAULT_CUSTOM;
+  const dark = _lum(cp.bg) < 0.4;
+  return {
+    name: "Custom", dark, custom: true,
+    accent: cp.accent, bg: cp.bg, surface: cp.surface, text: cp.text,
+    sub: _mix(cp.text, cp.bg, 0.42),
+    line: _mix(cp.surface, cp.text, dark ? 0.16 : 0.12),
+    onAccent: onAccentFor(cp.accent),
+  };
+}
+
+// Single source of truth for "the active palette" — presets or custom.
+function resolvePalette(cfg) {
+  if (cfg && cfg.palette === "custom") return buildCustom(cfg.customPalette);
+  return PALETTES[(cfg || {}).palette] || PALETTES.coffee;
+}
+
 // 5 layout presets. Each defines how the POS panes arrange.
 // cart: 'right' | 'left' | 'bottom' | 'none'
 // rail: show a category rail (triple layout)
@@ -102,6 +133,7 @@ const DEFAULT_CONFIG = {
   preset: "counter",
   device: "tablet",
   palette: "coffee",
+  customPalette: null, // { accent, bg, surface, text } — seeded when "Custom" is chosen
   font: "inter",
   canvasMode: "screen", // screen | receipt
   receipt: RECEIPT_DEFAULTS,
@@ -122,4 +154,4 @@ const DEFAULT_CONFIG = {
   selected: "menu",
 };
 
-Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, RECEIPT_PAPERS, RECEIPT_PAPER_ORDER, RECEIPT_DEFS, RECEIPT_DEFAULTS, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG });
+Object.assign(window, { PALETTES, PRESETS, PRESET_ORDER, DEVICES, DEVICE_ORDER, FONTS, FONT_ORDER, RECEIPT_PAPERS, RECEIPT_PAPER_ORDER, RECEIPT_DEFS, RECEIPT_DEFAULTS, SAMPLE, ALL_TABS, SECTION_DEFS, DEFAULT_CONFIG, resolvePalette, buildCustom, contrastRatio, onAccentFor, DEFAULT_CUSTOM });

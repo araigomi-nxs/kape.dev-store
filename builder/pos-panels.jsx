@@ -196,8 +196,22 @@ function RadiusRow({ label, value, onChange }) {
   );
 }
 
+function ColorRow({ label, value, onChange }) {
+  const norm = (v) => { v = (v || "").trim(); if (v && v[0] !== "#") v = "#" + v; return v; };
+  return (
+    <div className="color-row">
+      <span className="mono">{label}</span>
+      <label className="color-ctl">
+        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} />
+        <input className="hexinp" value={value} maxLength={7} spellCheck={false}
+          onChange={(e) => onChange(norm(e.target.value))} />
+      </label>
+    </div>
+  );
+}
+
 function Inspector({ cfg, set }) {
-  const pal = window.PALETTES[cfg.palette];
+  const pal = window.resolvePalette(cfg);
   const dragTab = useRef(null);
 
   const cartChoice = cfg.cart; // right|left|bottom|none
@@ -242,6 +256,38 @@ function Inspector({ cfg, set }) {
               </div>
             </div>
           ))}
+
+          {/* custom theme */}
+          {(() => {
+            const cp = cfg.customPalette || window.DEFAULT_CUSTOM;
+            const isCustom = cfg.palette === "custom";
+            const resolved = window.buildCustom(cp);
+            const warn = [];
+            if (window.contrastRatio(cp.text, cp.bg) < 4) warn.push("text vs background is low");
+            if (window.contrastRatio(resolved.onAccent, cp.accent) < 3) warn.push("button text vs accent is low");
+            return (
+              <div className="sw-group">
+                <span className="sw-grp-label">Custom</span>
+                <div className="swatches">
+                  <button className={"sw cust" + (isCustom ? " on" : "")}
+                    style={{ background: cp.surface }} title="Custom theme" onClick={set.useCustom}>
+                    <span className="dot" style={{ background: cp.accent }} />
+                    <span className="nm">Custom</span>
+                  </button>
+                </div>
+                {isCustom && (
+                  <div className="custom-edit">
+                    {[["accent", "Accent"], ["bg", "Background"], ["surface", "Surface"], ["text", "Text"]].map(([k, lb]) => (
+                      <ColorRow key={k} label={lb} value={cp[k]} onChange={(v) => set.customColor(k, v)} />
+                    ))}
+                    <div className="hint">
+                      Sub-text, hairlines &amp; button text auto-adjust. {warn.length ? <b>⚠ {warn.join(" · ")}.</b> : "Contrast looks good ✓"}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* typeface */}

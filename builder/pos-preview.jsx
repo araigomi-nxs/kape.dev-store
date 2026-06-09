@@ -128,7 +128,7 @@ function Zone({ id, picked, pickMode, onPick, tag, children, style }) {
 }
 
 function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
-  const pal = window.PALETTES[cfg.palette];
+  const pal = window.resolvePalette(cfg);
   const dev = window.DEVICES[cfg.device];
   const preset = window.PRESETS[cfg.preset];
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
@@ -143,6 +143,7 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const posVars = {
     "--pos-accent": pal.accent, "--pos-bg": pal.bg, "--pos-surface": pal.surface,
     "--pos-text": pal.text, "--pos-sub": pal.sub, "--pos-line": pal.line,
+    "--pos-on-accent": pal.onAccent || "#fff",
     "--pos-font": font.stack,
     "--pos-r-panel": (cfg.radiusPanel ?? 14) + "px",
     "--pos-r-card": (cfg.radiusCard ?? 12) + "px",

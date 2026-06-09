@@ -23,7 +23,7 @@ function FauxQR({ size = 58 }) {
 }
 
 function ReceiptPreview({ cfg, compact }) {
-  const pal = window.PALETTES[cfg.palette];
+  const pal = window.resolvePalette(cfg);
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const r = cfg.receipt || window.RECEIPT_DEFAULTS;
   const el = r.elements || {};
@@ -58,7 +58,7 @@ function ReceiptPreview({ cfg, compact }) {
               <div className={"rcpt-logo" + (cfg.logo ? " has-img" : "")}
                 style={cfg.logo
                   ? { height: "auto", width: "auto", borderRadius: 4, background: "transparent" }
-                  : { background: pal.accent, fontFamily: font.stack }}>
+                  : { background: pal.accent, color: pal.onAccent || "#fff", fontFamily: font.stack }}>
                 {cfg.logo
                   ? <img src={cfg.logo} alt="logo" style={{ height: cfg.logoSize ?? 46, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }} />
                   : (cfg.initials || "·")}
