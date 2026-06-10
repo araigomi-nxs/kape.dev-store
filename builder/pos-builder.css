@@ -831,6 +831,31 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 }
 .gal-hint i { font-style: normal; opacity: 0.4; }
 
+/* device switcher — re-renders every card at the chosen device resolution */
+.gal-device {
+  position: absolute; top: 44px; right: 52px; z-index: 40;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 9px;
+}
+.gal-device > span {
+  font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase; color: #9b948a;
+}
+.gal-dev-btns {
+  display: flex; gap: 4px; padding: 4px;
+  background: rgba(10, 10, 9, 0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 11px;
+}
+.gal-dev {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #9b948a; background: none; border: none; cursor: pointer;
+  padding: 8px 13px; border-radius: 8px; transition: all 0.2s;
+}
+.gal-dev i { font-style: normal; font-size: 0.8rem; line-height: 1; }
+.gal-dev:hover { color: #f2ede4; background: rgba(255, 255, 255, 0.06); }
+.gal-dev.on { color: #14110c; background: #c8a97e; }
+
 .gal-scene {
   position: absolute; inset: 0;
   perspective: 1900px;
@@ -943,9 +968,6 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 }
 .gal-dock-name i { font-style: normal; color: #9b948a; font-weight: 400; }
 
-@media (max-width: 1180px) {
-  .gal-card { --cw: 460; }
-}
 @media (max-width: 880px) {
   /* gallery collapses to a gently-tilted vertical deck (page scrolls inside
      .gal — the builder body keeps overflow:hidden) */
@@ -953,6 +975,7 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
   .gal-bg { position: fixed; }
   .gal-head { position: static; padding: 36px 22px 6px; max-width: none; }
   .gal-hint, .gal-dock { display: none; }
+  .gal-device { position: static; align-items: flex-start; flex-direction: row; align-items: center; gap: 12px; padding: 10px 22px 0; }
   .gal-scene { position: static; perspective: 1100px; padding: 26px 22px 70px; }
   .gal-stack { position: static; display: flex; flex-direction: column; gap: 34px; align-items: center; }
   .gal-card { --cw: 340; position: static; margin: 0; transform: none; width: calc(var(--cw) * 1px); max-width: 92vw; filter: none !important; }

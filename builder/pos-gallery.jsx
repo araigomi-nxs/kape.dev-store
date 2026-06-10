@@ -3,9 +3,28 @@
 // as tilted cards in a centered orbit. Scrolling (or ← →, or the dots) rotates
 // the orbit; clicking a background card brings it to the front; clicking the
 // front card sends it flying toward you and applies the design. Mouse movement
-// parallaxes the whole stack.
+// parallaxes the whole stack. The device switcher re-renders every card at the
+// chosen device's true resolution (skins reflow via container queries).
 
-function Gallery({ cfg, onPick, onBack }) {
+// card width + orbit spacing per preview device
+const GAL_SIZES = {
+  tablet:  { cw: 540, gap: 400 },
+  desktop: { cw: 620, gap: 450 },
+  phone:   { cw: 250, gap: 300 },
+};
+
+function useMedia(query) {
+  const [match, setMatch] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const fn = (e) => setMatch(e.matches);
+    mq.addEventListener("change", fn);
+    return () => mq.removeEventListener("change", fn);
+  }, [query]);
+  return match;
+}
+
+function Gallery({ cfg, onPick, onBack, onDevice }) {
   const sceneRef = useRef(null);
   const [idx, setIdx] = useState(0);
   const [going, setGoing] = useState(null);
@@ -13,9 +32,18 @@ function Gallery({ cfg, onPick, onBack }) {
   const n = order.length;
   const wheelAcc = useRef(0);
   const wheelLock = useRef(0);
+  const mobile = useMedia("(max-width: 880px)");
+  const narrow = useMedia("(max-width: 1280px)");
+
+  const device = cfg.device || "tablet";
+  const dev = window.DEVICES[device] || window.DEVICES.tablet;
+  const size = GAL_SIZES[device] || GAL_SIZES.tablet;
+  const cw = mobile ? (dev.portrait ? 230 : 340) : Math.round(size.cw * (narrow ? 0.78 : 1));
+  const gap = Math.round(size.gap * (narrow ? 0.82 : 1));
+  const cardH = cw * (dev.h / dev.w);
 
   // each card previews the template merged over the current cfg, so the
-  // customer's business name & logo carry into every design
+  // customer's business name, logo & device carry into every design
   const previewCfg = (k) => {
     const t = window.TEMPLATES[k];
     return { ...cfg, ...t.cfg, sections: { ...cfg.sections, ...t.cfg.sections }, selected: null };
@@ -75,7 +103,6 @@ function Gallery({ cfg, onPick, onBack }) {
   const click = (k, off) => {
     if (going) return;
     // on the mobile vertical deck there is no orbit — every card opens directly
-    const mobile = window.matchMedia("(max-width: 880px)").matches;
     if (off !== 0 && !mobile) { setIdx((i) => i + off); return; }
     setGoing(k);
     setTimeout(() => onPick(k), 420);
@@ -97,6 +124,20 @@ function Gallery({ cfg, onPick, onBack }) {
         <p className="gal-sub">Ready-made POS designs by the kape.dev crew — cafés, terminals, galleries, consoles. Spin the orbit, claim one, and tune every panel for your shop.</p>
       </header>
 
+      <div className="gal-device">
+        <span>preview on</span>
+        <div className="gal-dev-btns">
+          {window.DEVICE_ORDER.map((k) => (
+            <button
+              key={k}
+              className={"gal-dev" + (device === k ? " on" : "")}
+              title={window.DEVICES[k].w + "×" + window.DEVICES[k].h}
+              onClick={() => onDevice && onDevice(k)}
+            ><i>{window.DEVICES[k].glyph}</i>{window.DEVICES[k].name}</button>
+          ))}
+        </div>
+      </div>
+
       <div className="gal-scene">
         <div className="gal-stack">
           {order.map((k, i) => {
@@ -108,8 +149,10 @@ function Gallery({ cfg, onPick, onBack }) {
                 key={k}
                 className={"gal-card" + (off === 0 ? " front" : "") + (going === k ? " go" : "")}
                 style={{
+                  "--cw": cw,
+                  marginTop: mobile ? 0 : -(cardH / 2 + 14),
                   // wide spread keeps background cards clickable past the front card
-                  "--tx": (off * 430) + "px",
+                  "--tx": (off * gap) + "px",
                   "--ty": (a * -58) + "px",
                   "--tz": (off === 0 ? 170 : -150 - a * 165) + "px",
                   "--par": (30 - a * 8) + "px",
@@ -119,8 +162,8 @@ function Gallery({ cfg, onPick, onBack }) {
               >
                 <div className="gal-tilt">
                   <div className="gal-float" style={{ animationDelay: (i * -2.3) + "s" }}>
-                    <div className="gal-frame">
-                      <div className="gal-mini">
+                    <div className="gal-frame" style={{ aspectRatio: dev.w + " / " + dev.h }}>
+                      <div className="gal-mini" style={{ width: dev.w, height: dev.h, transform: "scale(" + (cw / dev.w) + ")" }}>
                         <SkinView cfg={previewCfg(k)} />
                       </div>
                       <div className="gal-sheen" />
@@ -153,7 +196,7 @@ function Gallery({ cfg, onPick, onBack }) {
           ))}
         </div>
         <button className="gal-arrow" onClick={() => setIdx((i) => i + 1)} aria-label="Next design">→</button>
-        <span className="gal-dock-name">{frontT.name} <i>· {frontT.tagline}</i></span>
+        <span className="gal-dock-name">{frontT.name} <i>· {frontT.tagline} · {dev.name.toLowerCase()}</i></span>
       </div>
 
       <footer className="gal-hint">

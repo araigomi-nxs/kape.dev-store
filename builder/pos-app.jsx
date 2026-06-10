@@ -116,6 +116,7 @@ function App() {
       <>
         <Gallery
           cfg={cfg}
+          onDevice={(k) => set.patch({ device: k })}
           onBack={visited ? () => setView("builder") : null}
           onPick={(k) => {
             // picking the already-applied design just resumes — re-applying
