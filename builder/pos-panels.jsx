@@ -250,16 +250,16 @@ function Inspector({ cfg, set }) {
         {/* theme */}
         <div className="insp-sec">
           <span className="mono">Colour theme</span>
-          {[["Light", false], ["Dark", true]].map(([grpLabel, isDark]) => (
+          {[["Light", "light"], ["Dark", "dark"], ["Gradient", "gradient"]].map(([grpLabel, grp]) => (
             <div key={grpLabel} className="sw-group">
               <span className="sw-grp-label">{grpLabel}</span>
               <div className="swatches">
-                {Object.keys(window.PALETTES).filter((k) => !!window.PALETTES[k].dark === isDark).map((k) => {
+                {Object.keys(window.PALETTES).filter((k) => (window.PALETTES[k].group || (window.PALETTES[k].dark ? "dark" : "light")) === grp).map((k) => {
                   const p = window.PALETTES[k];
                   return (
                     <button key={k} className={"sw" + (cfg.palette === k ? " on" : "")}
                       style={{ background: p.surface }} title={p.name} onClick={() => set.patch({ palette: k })}>
-                      <span className="dot" style={{ background: p.accent }} />
+                      <span className="dot" style={{ background: p.grad || p.accent }} />
                       <span className="nm">{p.name}</span>
                     </button>
                   );

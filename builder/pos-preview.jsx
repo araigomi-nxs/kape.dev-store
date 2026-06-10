@@ -173,6 +173,7 @@ function BoutiqueLive({ cfg }) {
   const tabCls = ["", "yellow", "lav"];
   const vars = {
     "--bq-accent": accent,
+    "--bq-accent-grad": pal.grad || accent,
     "--bq-on-accent": pal.onAccent || window.onAccentFor(accent),
     "--bq-text": pal.text,
     "--bq-sub": pal.sub,
@@ -264,6 +265,7 @@ function TerminalLive({ cfg }) {
   const tabs = (cfg.tabs || []).slice(0, 5);
   const vars = {
     "--cp-accent": accent,
+    "--cp-accent-grad": pal.grad || accent,
     "--cp-on-accent": pal.onAccent || window.onAccentFor(accent),
     "--cp-text": pal.text,
     "--cp-sub": pal.sub,
@@ -355,6 +357,7 @@ function GalleryLive({ cfg }) {
   const tabs = (cfg.tabs || []).slice(0, 4);
   const vars = {
     "--gl-accent": accent,
+    "--gl-accent-grad": pal.grad || accent,
     "--gl-on-accent": pal.onAccent || window.onAccentFor(accent),
     "--gl-text": pal.text,
     "--gl-sub": pal.sub,
@@ -455,6 +458,7 @@ function ConsoleLive({ cfg }) {
   const tabs = (cfg.tabs || []).slice(0, 4);
   const vars = {
     "--cn-accent": accent,
+    "--cn-accent-grad": pal.grad || accent,
     "--cn-on-accent": pal.onAccent || window.onAccentFor(accent),
     "--cn-text": pal.text,
     "--cn-sub": pal.sub,
@@ -580,7 +584,7 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const cartW = cfg.cartW ?? 240;
   const railW = cfg.railW ?? 118;
   const posVars = {
-    "--pos-accent": pal.accent, "--pos-bg": pal.bg, "--pos-surface": pal.surface,
+    "--pos-accent": pal.accent, "--pos-accent-grad": pal.grad || pal.accent, "--pos-bg": pal.bg, "--pos-surface": pal.surface,
     "--pos-text": pal.text, "--pos-sub": pal.sub, "--pos-line": pal.line,
     "--pos-on-accent": pal.onAccent || "#fff",
     "--pos-font": font.stack,
