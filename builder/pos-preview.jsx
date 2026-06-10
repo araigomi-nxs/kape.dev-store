@@ -167,11 +167,26 @@ function Zone({ id, picked, pickMode, onPick, tag, children, style, grip, gripTi
   );
 }
 
+// Shared by the four ready-made skins: the order panel docks left/right
+// (cfg.skinCart) and resizes (cfg.skinCartW) — `edit` is provided by SkinStage
+// only inside the live builder canvas.
+const skinLeft = (cfg) => (cfg.skinCart || "right") === "left";
+const skinBodyCls = (cfg) => (skinLeft(cfg) ? " cart-left" : "");
+const skinSideCls = (cfg) => (skinLeft(cfg) ? " dock-left" : "");
+const skinSideStyle = (cfg) => (cfg.skinCartW ? { "--skin-cart-w": cfg.skinCartW + "px" } : undefined);
+function SideGrip({ edit }) {
+  if (!edit) return null;
+  return (
+    <span className="zone-grip" title="Drag to dock left · right"
+      onPointerDown={edit.dock} onClick={(e) => e.stopPropagation()}>⠿</span>
+  );
+}
+
 // ---- Boutique skin ----------------------------------------------------------
 // A distinct "café" design (greeting hero · pill tabs · icon cards · order rail).
 // Driven by cfg so theme/font/corners stay customizable; used in both the
 // ready-made modal and the live builder canvas, so they always match.
-function BoutiqueLive({ cfg }) {
+function BoutiqueLive({ cfg, edit }) {
   const pal = window.resolvePalette(cfg);
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const accent = pal.accent;
@@ -226,7 +241,7 @@ function BoutiqueLive({ cfg }) {
         <div className="bq-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
         <div className="bq-headright"><span className="bq-clock">09:41 AM</span><span className="bq-avatar" /></div>
       </div>
-      <div className="bq-body">
+      <div className={"bq-body" + skinBodyCls(cfg)}>
       <div className="bq-main">
         <div className="bq-hero">
           <h2>Good morning,<br />Cashier!</h2>
@@ -241,7 +256,9 @@ function BoutiqueLive({ cfg }) {
         <div className="bq-sec"><i />Fresh Pastries</div>
         <div className="bq-grid">{cards2.map(Card)}</div>
       </div>
-      <div className="bq-side">
+      {edit && edit.splitter(236)}
+      <div className={"bq-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+        <SideGrip edit={edit} />
         <div className="bq-side-head"><h3>Current Order</h3><span className="bq-order-no">#A12</span></div>
         <div className="bq-modes"><span className="bq-mode on">Dine in</span><span className="bq-mode">To go</span></div>
         <div className="bq-line">
@@ -264,7 +281,7 @@ function BoutiqueLive({ cfg }) {
 // A precise "counter terminal" design: product grid with SKU IDs + mono specs,
 // and an order ticket with subtotal/tax + park/checkout. Palette/font/corner
 // driven, so it stays customizable and matches across modal + canvas.
-function TerminalLive({ cfg }) {
+function TerminalLive({ cfg, edit }) {
   const pal = window.resolvePalette(cfg);
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const accent = pal.accent;
@@ -307,7 +324,7 @@ function TerminalLive({ cfg }) {
         <div className="cp-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
         <div className="cp-headright"><span className="cp-clock">09:41 AM</span><span className="cp-avatar" /></div>
       </div>
-      <div className="cp-body">
+      <div className={"cp-body" + skinBodyCls(cfg)}>
         <div className="cp-main">
           <div className="cp-tabs">
             {tabs.map((t, i) => (<span className={"cp-tab" + (i === 0 ? " on" : "")} key={t + i}>{t}</span>))}
@@ -323,7 +340,9 @@ function TerminalLive({ cfg }) {
             ))}
           </div>
         </div>
-        <div className="cp-side">
+        {edit && edit.splitter(250)}
+        <div className={"cp-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+          <SideGrip edit={edit} />
           <div className="cp-side-head"><h3>Current Order</h3><span className="cp-meta">TS_ID 9926-6A · TABLE 12</span></div>
           <div className="cp-ticket">
             <div className="cp-tline">
@@ -356,7 +375,7 @@ function TerminalLive({ cfg }) {
 // A modern storefront design: photo-style product cards with badges, an order
 // rail with item thumbnails, quantity steppers, an order-notes field and a
 // floating add button. Palette/font/corner driven.
-function GalleryLive({ cfg }) {
+function GalleryLive({ cfg, edit }) {
   const pal = window.resolvePalette(cfg);
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const accent = pal.accent;
@@ -403,7 +422,7 @@ function GalleryLive({ cfg }) {
         <div className="gl-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
         <div className="gl-headright"><span className="gl-clock">09:41 AM</span><span className="gl-avatar" /></div>
       </div>
-      <div className="gl-body">
+      <div className={"gl-body" + skinBodyCls(cfg)}>
         <div className="gl-main">
           <div className="gl-tabs">
             <span className="gl-tab on">All Items</span>
@@ -425,7 +444,9 @@ function GalleryLive({ cfg }) {
           </div>
           <div className="gl-fab">+</div>
         </div>
-        <div className="gl-side">
+        {edit && edit.splitter(280)}
+        <div className={"gl-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+          <SideGrip edit={edit} />
           <div className="gl-side-head"><h3>Current Order</h3><span className="gl-clear">Clear cart</span></div>
           <div className="gl-order">
             {order.map((o, i) => (
@@ -456,7 +477,7 @@ function GalleryLive({ cfg }) {
 // ---- Console skin -----------------------------------------------------------
 // A dark "developer console" POS: snake_case mono labels, object IDs, a faint
 // watermark and an EXECUTE_PAYMENT action. Palette/font/corner driven.
-function ConsoleLive({ cfg }) {
+function ConsoleLive({ cfg, edit }) {
   const pal = window.resolvePalette(cfg);
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
   const accent = pal.accent;
@@ -503,7 +524,7 @@ function ConsoleLive({ cfg }) {
         <div className="cn-brand">{cfg.business || "Your Business"}<small>// powered by kape.dev</small></div>
         <div className="cn-headright"><span className="cn-clock">09:41 AM</span><span className="cn-avatar" /></div>
       </div>
-      <div className="cn-body">
+      <div className={"cn-body" + skinBodyCls(cfg)}>
         <div className="cn-main">
           <div className="cn-tabs">
             <span className="cn-tab on">ALL_ITEMS</span>
@@ -526,7 +547,9 @@ function ConsoleLive({ cfg }) {
             </div>
           </div>
         </div>
-        <div className="cn-side">
+        {edit && edit.splitter(262)}
+        <div className={"cn-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+          <SideGrip edit={edit} />
           <div className="cn-side-head"><h3>CURRENT_ORDER</h3><span className="cn-clear">⌫ CLEAR</span></div>
           <div className="cn-ticket">
             {order.map((o, i) => (
@@ -554,22 +577,73 @@ function ConsoleLive({ cfg }) {
 
 // skin registry — maps cfg.skin → component (classic = generic builder preview)
 const SKINS = { boutique: BoutiqueLive, terminal: TerminalLive, gallery: GalleryLive, console: ConsoleLive };
-function SkinView({ cfg }) {
+function SkinView({ cfg, edit }) {
   const C = SKINS[cfg.skin];
-  return C ? <C cfg={cfg} /> : null;
+  return C ? <C cfg={cfg} edit={edit} /> : null;
 }
 
 // Renders a skin at its true device width (so container queries reflow for
 // tablet/phone), scaled to fit the canvas like the generic device preview.
-function SkinStage({ cfg, compact }) {
+// In the builder it also provides the `edit` kit: a width splitter and a
+// drag-to-dock grip for the skin's order panel.
+function SkinStage({ cfg, compact, pickMode, onResize }) {
   const dev = window.DEVICES[cfg.device] || window.DEVICES.tablet;
   const [ref, scale] = useFit(dev.w, dev.h, compact ? 24 : 48);
+  const resizable = pickMode && typeof onResize === "function" && !dev.portrait;
+  const [dockHint, setDockHint] = useState(null);
+  const dockRef = useRef(null);
+  const frameRef = useRef(null);
+
+  const startDock = (e) => {
+    if (!resizable) return;
+    e.preventDefault(); e.stopPropagation();
+    const move = (ev) => {
+      const f = frameRef.current;
+      if (!f) return;
+      const r = f.getBoundingClientRect();
+      const x = (ev.clientX - r.left) / r.width;
+      const dock = x < 0.45 ? "left" : x > 0.55 ? "right" : null;
+      dockRef.current = dock;
+      setDockHint({ dock });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      document.body.style.cursor = "";
+      const dock = dockRef.current;
+      if (dock && dock !== (cfg.skinCart || "right")) onResize({ skinCart: dock });
+      dockRef.current = null;
+      setDockHint(null);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    document.body.style.cursor = "grabbing";
+    dockRef.current = null;
+    setDockHint({ dock: null });
+  };
+
+  const edit = resizable ? {
+    dock: startDock,
+    splitter: (defW) => (
+      <Splitter axis="x" scale={scale} value={cfg.skinCartW ?? defW} def={defW}
+        min={190} max={Math.round(dev.w * 0.45)}
+        sign={cfg.skinCart === "left" ? 1 : -1}
+        onChange={(v) => onResize({ skinCartW: v })} />
+    ),
+  } : null;
+
   return (
     <div className="canvas-stage" ref={ref} style={compact ? { padding: 10, width: "100%", height: "100%" } : undefined}>
-      <div className="skin-frame" style={{ width: dev.w * scale, height: dev.h * scale }}>
+      <div className="skin-frame" ref={frameRef} style={{ width: dev.w * scale, height: dev.h * scale }}>
         <div className="skin-scaler" style={{ width: dev.w, height: dev.h, transform: `scale(${scale})` }}>
-          <SkinView cfg={cfg} />
+          <SkinView cfg={cfg} edit={edit} />
         </div>
+        {dockHint && (
+          <div className="pos-docks">
+            <div className={"pos-dock left" + (dockHint.dock === "left" ? " on" : "")}><span>⟵ dock left</span></div>
+            <div className={"pos-dock right" + (dockHint.dock === "right" ? " on" : "")}><span>dock right ⟶</span></div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -597,7 +671,7 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const cartDockRef = useRef(null);
 
   if (cfg.skin && SKINS[cfg.skin]) {
-    return <SkinStage cfg={cfg} compact={compact} />;
+    return <SkinStage cfg={cfg} compact={compact} pickMode={pickMode} onResize={onResize} />;
   }
 
   // saved order, tolerant of older configs / future rows

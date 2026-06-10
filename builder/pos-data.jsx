@@ -217,6 +217,8 @@ const DEFAULT_CONFIG = {
   menuLayout: "grid", // grid | list | compact
   cartW: 240,      // resizable order-cart width (device px)
   cartH: 150,      // resizable bottom-cart height (device px)
+  skinCart: "right",  // ready-made skins: order panel dock side (left | right)
+  skinCartW: null,    // ready-made skins: order panel width (device px; null = design default)
   railW: 118,      // resizable category-rail width (device px)
   stackOrder: ["header", "search", "tabs", "main", "pay"], // drag-to-reorder rows
   radiusPanel: 14, // corner radius — cart & rail panels

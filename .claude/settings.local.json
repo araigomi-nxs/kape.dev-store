@@ -81,7 +81,8 @@
       "Bash(npx --yes esbuild website/web-data.jsx website/web-templates.jsx --loader:.jsx=jsx --outdir=/tmp/wbcheck4)",
       "Bash(node wb-tokyo.js)",
       "Bash(node wb-posgal.js)",
-      "Bash(node wb-drag.js)"
+      "Bash(node wb-drag.js)",
+      "Bash(node wb-skin.js)"
     ],
     "additionalDirectories": [
       "\\tmp"
