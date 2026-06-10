@@ -82,7 +82,8 @@
       "Bash(node wb-tokyo.js)",
       "Bash(node wb-posgal.js)",
       "Bash(node wb-drag.js)",
-      "Bash(node wb-skin.js)"
+      "Bash(node wb-skin.js)",
+      "Bash(python -)"
     ],
     "additionalDirectories": [
       "\\tmp"

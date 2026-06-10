@@ -145,12 +145,41 @@ function Cart({ cfg, layout, width, height }) {
   );
 }
 
-function Zone({ id, picked, pickMode, onPick, tag, children, style, grip, gripTitle }) {
+// per-component scale (CSS zoom), stored in cfg.zoneScale
+const zoneZoom = (cfg, id) => (cfg.zoneScale || {})[id] || 1;
+const zStyle = (cfg, id) => {
+  const z = zoneZoom(cfg, id);
+  return z !== 1 ? { zoom: z } : undefined;
+};
+
+// generic scale drag: diagonal pointer movement (screen px → device px via
+// `scale`) maps onto a 0.7–1.5 zoom factor
+function startScaleDrag(e, scale, cur, apply) {
+  e.preventDefault();
+  e.stopPropagation();
+  const sx = e.clientX, sy = e.clientY;
+  const move = (ev) => {
+    const d = ((ev.clientX - sx) + (ev.clientY - sy)) / (2 * (scale || 1));
+    const nv = Math.round(Math.max(0.7, Math.min(1.5, cur + d / 200)) * 100) / 100;
+    apply(nv);
+  };
+  const up = () => {
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerup", up);
+    document.body.style.cursor = "";
+  };
+  window.addEventListener("pointermove", move);
+  window.addEventListener("pointerup", up);
+  document.body.style.cursor = "nwse-resize";
+}
+
+function Zone({ id, picked, pickMode, onPick, tag, children, style, grip, gripTitle, zoom, scaleStart, scaleReset }) {
+  const st = zoom && zoom !== 1 ? { ...(style || {}), zoom } : style;
   return (
     <div
       data-zone={id}
       className={(picked ? "picked " : "") + (pickMode ? "pickable" : "")}
-      style={style}
+      style={st}
       onClick={pickMode ? (e) => { e.stopPropagation(); onPick(id); } : undefined}
     >
       {picked && <span className="zone-tag">{tag}</span>}
@@ -161,6 +190,15 @@ function Zone({ id, picked, pickMode, onPick, tag, children, style, grip, gripTi
           onPointerDown={grip}
           onClick={(e) => e.stopPropagation()}
         >⠿</span>
+      )}
+      {pickMode && scaleStart && (
+        <span
+          className="zone-scale"
+          title="Drag to scale · double-click to reset"
+          onPointerDown={scaleStart}
+          onDoubleClick={(e) => { e.stopPropagation(); scaleReset && scaleReset(); }}
+          onClick={(e) => e.stopPropagation()}
+        >⤡</span>
       )}
       {children}
     </div>
@@ -179,6 +217,18 @@ function SideGrip({ edit }) {
   return (
     <span className="zone-grip" title="Drag to dock left · right"
       onPointerDown={edit.dock} onClick={(e) => e.stopPropagation()}>⠿</span>
+  );
+}
+
+// corner handle that scales a skin component (header / menu / order panel)
+function ScaleHandle({ edit, id, pos }) {
+  if (!edit || !edit.scaleStart) return null;
+  return (
+    <span className={"zone-scale" + (pos ? " " + pos : "")}
+      title="Drag to scale · double-click to reset"
+      onPointerDown={edit.scaleStart(id)}
+      onDoubleClick={(e) => { e.stopPropagation(); edit.scaleReset(id); }}
+      onClick={(e) => e.stopPropagation()}>⤡</span>
   );
 }
 
@@ -234,7 +284,8 @@ function BoutiqueLive({ cfg, edit }) {
   );
   return (
     <div className="bq skin-screen" style={vars}>
-      <div className="bq-header">
+      <div className="bq-header" style={zStyle(cfg, "header")}>
+        <ScaleHandle edit={edit} id="header" />
         <div className={"bq-logo" + (cfg.logo ? " has-img" : "")}>
           {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
         </div>
@@ -242,7 +293,8 @@ function BoutiqueLive({ cfg, edit }) {
         <div className="bq-headright"><span className="bq-clock">09:41 AM</span><span className="bq-avatar" /></div>
       </div>
       <div className={"bq-body" + skinBodyCls(cfg)}>
-      <div className="bq-main">
+      <div className="bq-main" style={zStyle(cfg, "menu")}>
+        <ScaleHandle edit={edit} id="menu" pos="tr" />
         <div className="bq-hero">
           <h2>Good morning,<br />Cashier!</h2>
           <p>Ready to serve some warmth? Explore our fresh pastry selection and seasonal teas.</p>
@@ -257,8 +309,9 @@ function BoutiqueLive({ cfg, edit }) {
         <div className="bq-grid">{cards2.map(Card)}</div>
       </div>
       {edit && edit.splitter(236)}
-      <div className={"bq-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+      <div className={"bq-side" + skinSideCls(cfg)} style={{ ...(skinSideStyle(cfg) || {}), ...(zStyle(cfg, "cart") || {}) }}>
         <SideGrip edit={edit} />
+          <ScaleHandle edit={edit} id="cart" />
         <div className="bq-side-head"><h3>Current Order</h3><span className="bq-order-no">#A12</span></div>
         <div className="bq-modes"><span className="bq-mode on">Dine in</span><span className="bq-mode">To go</span></div>
         <div className="bq-line">
@@ -317,7 +370,8 @@ function TerminalLive({ cfg, edit }) {
   ];
   return (
     <div className="cp skin-screen" style={vars}>
-      <div className="cp-header">
+      <div className="cp-header" style={zStyle(cfg, "header")}>
+        <ScaleHandle edit={edit} id="header" />
         <div className={"cp-logo" + (cfg.logo ? " has-img" : "")}>
           {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
         </div>
@@ -325,7 +379,8 @@ function TerminalLive({ cfg, edit }) {
         <div className="cp-headright"><span className="cp-clock">09:41 AM</span><span className="cp-avatar" /></div>
       </div>
       <div className={"cp-body" + skinBodyCls(cfg)}>
-        <div className="cp-main">
+        <div className="cp-main" style={zStyle(cfg, "menu")}>
+        <ScaleHandle edit={edit} id="menu" pos="tr" />
           <div className="cp-tabs">
             {tabs.map((t, i) => (<span className={"cp-tab" + (i === 0 ? " on" : "")} key={t + i}>{t}</span>))}
           </div>
@@ -341,8 +396,9 @@ function TerminalLive({ cfg, edit }) {
           </div>
         </div>
         {edit && edit.splitter(250)}
-        <div className={"cp-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+        <div className={"cp-side" + skinSideCls(cfg)} style={{ ...(skinSideStyle(cfg) || {}), ...(zStyle(cfg, "cart") || {}) }}>
           <SideGrip edit={edit} />
+          <ScaleHandle edit={edit} id="cart" />
           <div className="cp-side-head"><h3>Current Order</h3><span className="cp-meta">TS_ID 9926-6A · TABLE 12</span></div>
           <div className="cp-ticket">
             <div className="cp-tline">
@@ -415,7 +471,8 @@ function GalleryLive({ cfg, edit }) {
   ];
   return (
     <div className="gl skin-screen" style={vars}>
-      <div className="gl-header">
+      <div className="gl-header" style={zStyle(cfg, "header")}>
+        <ScaleHandle edit={edit} id="header" />
         <div className={"gl-logo" + (cfg.logo ? " has-img" : "")}>
           {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
         </div>
@@ -423,7 +480,8 @@ function GalleryLive({ cfg, edit }) {
         <div className="gl-headright"><span className="gl-clock">09:41 AM</span><span className="gl-avatar" /></div>
       </div>
       <div className={"gl-body" + skinBodyCls(cfg)}>
-        <div className="gl-main">
+        <div className="gl-main" style={zStyle(cfg, "menu")}>
+        <ScaleHandle edit={edit} id="menu" pos="tr" />
           <div className="gl-tabs">
             <span className="gl-tab on">All Items</span>
             {tabs.map((t, i) => (<span className="gl-tab" key={t + i}>{t}</span>))}
@@ -445,8 +503,9 @@ function GalleryLive({ cfg, edit }) {
           <div className="gl-fab">+</div>
         </div>
         {edit && edit.splitter(280)}
-        <div className={"gl-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+        <div className={"gl-side" + skinSideCls(cfg)} style={{ ...(skinSideStyle(cfg) || {}), ...(zStyle(cfg, "cart") || {}) }}>
           <SideGrip edit={edit} />
+          <ScaleHandle edit={edit} id="cart" />
           <div className="gl-side-head"><h3>Current Order</h3><span className="gl-clear">Clear cart</span></div>
           <div className="gl-order">
             {order.map((o, i) => (
@@ -517,7 +576,8 @@ function ConsoleLive({ cfg, edit }) {
   const watermark = ((cfg.initials || cfg.business || "S").trim()[0] || "S").toUpperCase();
   return (
     <div className="cn skin-screen" style={vars}>
-      <div className="cn-header">
+      <div className="cn-header" style={zStyle(cfg, "header")}>
+        <ScaleHandle edit={edit} id="header" />
         <div className={"cn-logo" + (cfg.logo ? " has-img" : "")}>
           {cfg.logo ? <img src={cfg.logo} alt="logo" /> : (cfg.initials || "·")}
         </div>
@@ -525,7 +585,8 @@ function ConsoleLive({ cfg, edit }) {
         <div className="cn-headright"><span className="cn-clock">09:41 AM</span><span className="cn-avatar" /></div>
       </div>
       <div className={"cn-body" + skinBodyCls(cfg)}>
-        <div className="cn-main">
+        <div className="cn-main" style={zStyle(cfg, "menu")}>
+        <ScaleHandle edit={edit} id="menu" pos="tr" />
           <div className="cn-tabs">
             <span className="cn-tab on">ALL_ITEMS</span>
             {tabs.map((t, i) => (<span className="cn-tab" key={t + i}>{code(t)}</span>))}
@@ -548,8 +609,9 @@ function ConsoleLive({ cfg, edit }) {
           </div>
         </div>
         {edit && edit.splitter(262)}
-        <div className={"cn-side" + skinSideCls(cfg)} style={skinSideStyle(cfg)}>
+        <div className={"cn-side" + skinSideCls(cfg)} style={{ ...(skinSideStyle(cfg) || {}), ...(zStyle(cfg, "cart") || {}) }}>
           <SideGrip edit={edit} />
+          <ScaleHandle edit={edit} id="cart" />
           <div className="cn-side-head"><h3>CURRENT_ORDER</h3><span className="cn-clear">⌫ CLEAR</span></div>
           <div className="cn-ticket">
             {order.map((o, i) => (
@@ -630,11 +692,18 @@ function SkinStage({ cfg, compact, pickMode, onResize }) {
         sign={cfg.skinCart === "left" ? 1 : -1}
         onChange={(v) => onResize({ skinCartW: v })} />
     ),
+    scaleStart: (id) => (e) =>
+      startScaleDrag(e, scale, zoneZoom(cfg, id), (nv) =>
+        onResize({ zoneScale: { ...(cfg.zoneScale || {}), [id]: nv } })),
+    scaleReset: (id) => onResize({ zoneScale: { ...(cfg.zoneScale || {}), [id]: 1 } }),
   } : null;
 
+  // drag affordances pick up the design's own accent (theme-aware)
+  const pal = window.resolvePalette(cfg);
   return (
     <div className="canvas-stage" ref={ref} style={compact ? { padding: 10, width: "100%", height: "100%" } : undefined}>
-      <div className="skin-frame" ref={frameRef} style={{ width: dev.w * scale, height: dev.h * scale }}>
+      <div className="skin-frame" ref={frameRef}
+        style={{ width: dev.w * scale, height: dev.h * scale, "--drag-accent": pal.accent, "--drag-on": pal.onAccent || "#fff" }}>
         <div className="skin-scaler" style={{ width: dev.w, height: dev.h, transform: `scale(${scale})` }}>
           <SkinView cfg={cfg} edit={edit} />
         </div>
@@ -724,6 +793,14 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
     setRowDrag({ id, over: null });
   };
 
+  // per-zone scale handles (corner ⤡ on hover)
+  const startScale = (id) => (e) => {
+    if (!resizable) return;
+    startScaleDrag(e, scale, zoneZoom(cfg, id), (nv) =>
+      onResize({ zoneScale: { ...(cfg.zoneScale || {}), [id]: nv } }));
+  };
+  const resetScale = (id) => () => onResize({ zoneScale: { ...(cfg.zoneScale || {}), [id]: 1 } });
+
   const startCartDrag = (e) => {
     if (!resizable) return;
     e.preventDefault(); e.stopPropagation();
@@ -768,7 +845,8 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
 
   const menu = S.menu && (
     <Zone id="menu" picked={cfg.selected === "menu"} pickMode={pickMode} onPick={onPick} tag="menu grid"
-      style={{ flex: 1, minWidth: 0, display: "flex" }}>
+      style={{ flex: 1, minWidth: 0, display: "flex" }}
+      zoom={zoneZoom(cfg, "menu")} scaleStart={startScale("menu")} scaleReset={resetScale("menu")}>
       <MenuGrid cfg={cfg} pal={pal} cols={phone ? 2 : cfg.menuCols} />
     </Zone>
   );
@@ -778,7 +856,8 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const cart = S.cart && cartPos !== "none" && (
     <Zone id="cart" picked={cfg.selected === "cart"} pickMode={pickMode} onPick={onPick} tag="order cart"
       style={ cartSide ? { flex: "none", display: "flex" } : { flex: "none" } }
-      grip={!phone ? startCartDrag : null} gripTitle="Drag to dock left · right · bottom">
+      grip={!phone ? startCartDrag : null} gripTitle="Drag to dock left · right · bottom"
+      zoom={zoneZoom(cfg, "cart")} scaleStart={startScale("cart")} scaleReset={resetScale("cart")}>
       <Cart cfg={cfg} layout={cartSide ? "side" : "bottom"} width={cartW}
         height={!cartSide && !phone ? cartH : undefined} />
     </Zone>
@@ -825,7 +904,8 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   const rowEls = {
     header: (
       <Zone id="header" picked={cfg.selected === "header"} pickMode={pickMode} onPick={onPick} tag="header"
-        grip={startRowDrag("header")} gripTitle="Drag up · down to reorder">
+        grip={startRowDrag("header")} gripTitle="Drag up · down to reorder"
+        zoom={zoneZoom(cfg, "header")} scaleStart={startScale("header")} scaleReset={resetScale("header")}>
         <div className="pos-header">
           {(() => {
             const b = Math.max(30, Math.min(56, Math.round((cfg.logoSize ?? 46) * 0.82)));
@@ -849,7 +929,8 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
     ),
     search: S.search && (
       <Zone id="search" picked={cfg.selected === "search"} pickMode={pickMode} onPick={onPick} tag="search bar"
-        grip={startRowDrag("search")} gripTitle="Drag up · down to reorder">
+        grip={startRowDrag("search")} gripTitle="Drag up · down to reorder"
+        zoom={zoneZoom(cfg, "search")} scaleStart={startScale("search")} scaleReset={resetScale("search")}>
         <div className="pos-search">
           <span className="pos-search-ic">⌕</span>
           <span className="pos-search-ph">Search the menu…</span>
@@ -858,7 +939,8 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
     ),
     tabs: S.tabs && (
       <Zone id="tabs" picked={cfg.selected === "tabs"} pickMode={pickMode} onPick={onPick} tag="category tabs"
-        grip={startRowDrag("tabs")} gripTitle="Drag up · down to reorder">
+        grip={startRowDrag("tabs")} gripTitle="Drag up · down to reorder"
+        zoom={zoneZoom(cfg, "tabs")} scaleStart={startScale("tabs")} scaleReset={resetScale("tabs")}>
         <div className="pos-tabs">
           {cfg.tabs.map((t, i) => (
             <div className={"pos-tab" + (i === 0 ? " on" : "")} key={t + i}>{t}</div>
@@ -869,7 +951,8 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
     main: <div className={mainClass}>{mainKids}</div>,
     pay: S.pay && cartPos === "none" && (
       <Zone id="pay" picked={cfg.selected === "pay"} pickMode={pickMode} onPick={onPick} tag="quick-pay bar"
-        grip={startRowDrag("pay")} gripTitle="Drag up · down to reorder">
+        grip={startRowDrag("pay")} gripTitle="Drag up · down to reorder"
+        zoom={zoneZoom(cfg, "pay")} scaleStart={startScale("pay")} scaleReset={resetScale("pay")}>
         <div style={{ padding: "12px 18px", borderTop: "1px solid var(--pos-line)", background: "var(--pos-surface)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--pos-sub)" }}>3 items</span>
           <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 17, marginLeft: "auto", color: "var(--pos-text)" }}>₱505</span>
