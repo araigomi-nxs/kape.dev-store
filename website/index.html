@@ -3,30 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>kape.dev · POS Builder</title>
-<script>(function(){var t=localStorage.getItem('kape-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
-<link rel="stylesheet" href="pos-builder.css?v=30" />
+<title>kape.dev · Website Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="web-builder.css?v=3" />
 </head>
 <body>
 <div id="root"></div>
-<!-- React + Babel (pinned) -->
+
+<!-- React + Babel (pinned, same as POS builder) -->
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<!-- optional: PNG capture (best-effort; spec download works without it) -->
+<!-- optional: PNG snapshot capture (submit works without it) -->
 <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
 
 <!-- Supabase (stores commissions) -->
 <script src="../supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script type="text/babel" src="pos-data.jsx?v=30"></script>
-<script type="text/babel" src="pos-preview.jsx?v=30"></script>
-<script type="text/babel" src="pos-panels.jsx?v=30"></script>
-<script type="text/babel" src="pos-receipt.jsx?v=30"></script>
-<script type="text/babel" src="pos-gallery.jsx?v=30"></script>
-<script type="text/babel" src="pos-review.jsx?v=30"></script>
-<script type="text/babel" src="pos-app.jsx?v=30"></script>
+<script type="text/babel" src="web-data.jsx?v=3"></script>
+<script type="text/babel" src="web-templates.jsx?v=3"></script>
+<script type="text/babel" src="web-gallery.jsx?v=3"></script>
+<script type="text/babel" src="web-review.jsx?v=3"></script>
+<script type="text/babel" src="web-app.jsx?v=3"></script>
 </body>
 </html>

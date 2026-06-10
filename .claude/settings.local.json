@@ -60,7 +60,29 @@
       "Bash(curl -s -X POST https://blnngmdbkmprwcepubte.supabase.co/rest/v1/commissions -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbm5nbWRia21wcndjZXB1YnRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTQzMzgsImV4cCI6MjA5NjQ3MDMzOH0.SvgJoDaYxJWqLSWOAN_pbnxnaJg2J1km3xiu9twICMM' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbm5nbWRia21wcndjZXB1YnRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTQzMzgsImV4cCI6MjA5NjQ3MDMzOH0.SvgJoDaYxJWqLSWOAN_pbnxnaJg2J1km3xiu9twICMM' -H 'Content-Type: application/json' -H 'Prefer: return=minimal' -d '{\"name\":\"__probe__\",\"email\":\"probe@test.com\"}' -w '\\\\nHTTP %{http_code}\\\\n')",
       "Bash(curl -s \"https://kapedev-store.vercel.app/builder/index.html\")",
       "Bash(curl -s \"https://kapedev-store.vercel.app/builder/pos-review.jsx\")",
-      "Bash(curl -s \"https://kape-admin-theta.vercel.app/\")"
+      "Bash(curl -s \"https://kape-admin-theta.vercel.app/\")",
+      "Bash(ls *.jsx *.js)",
+      "Bash(git log *)",
+      "Bash(npx --yes esbuild website/web-data.jsx website/web-templates.jsx website/web-gallery.jsx website/web-review.jsx website/web-app.jsx --loader:.jsx=jsx --outdir=/tmp/wbcheck)",
+      "Bash(npx --yes esbuild website/web-templates.jsx website/web-review.jsx --loader:.jsx=jsx --outdir=/tmp/wbcheck2)",
+      "Read(//c/tmp/**)",
+      "Bash(npx --yes -p playwright node wb-verify.js)",
+      "Bash(cp ../wb-verify.js .)",
+      "Bash(node wb-verify.js)",
+      "Bash(sed -i 's/?v=1/?v=2/g' website/index.html)",
+      "Bash(npx --yes esbuild website/web-data.jsx website/web-templates.jsx website/web-gallery.jsx --loader:.jsx=jsx --outdir=/tmp/wbcheck3)",
+      "Read(//tmp/**)",
+      "Bash(node wb-verify2.js)",
+      "Bash(node wb-debug.js)",
+      "Bash(node wb-debug2.js)",
+      "Bash(node wb-verify3.js)",
+      "Bash(python -c ' *)",
+      "Bash(sed -i 's/?v=2/?v=3/g' website/index.html)",
+      "Bash(npx --yes esbuild website/web-data.jsx website/web-templates.jsx --loader:.jsx=jsx --outdir=/tmp/wbcheck4)",
+      "Bash(node wb-tokyo.js)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

@@ -28,6 +28,8 @@ function App() {
   const [hist, setHist] = useS(() => ({ past: [], present: loadCfg(), future: [] }));
   const cfg = hist.present;
   const [modal, setModal] = useS(null); // null | 'submit' | 'export'
+  const [view, setView] = useS("gallery"); // gallery (full-page template selector — the landing view) | builder
+  const [visited, setVisited] = useS(false); // gallery reopened from inside the builder
   const [toastMsg, setToastMsg] = useS(null);
 
   const setCfg = (updater) => setHist((h) => {
@@ -106,13 +108,37 @@ function App() {
   const sel = cfg.selected ? (window.SECTION_DEFS.find((s) => s.id === cfg.selected) || {}).label : null;
   const receiptMode = cfg.canvasMode === "receipt";
 
+  // full-page orbital template selector — same page as the website builder.
+  // It's the landing view; "back to builder" only appears once the user has
+  // actually been in the builder (otherwise the link points home, to the store).
+  if (view === "gallery") {
+    return (
+      <>
+        <Gallery
+          cfg={cfg}
+          onBack={visited ? () => setView("builder") : null}
+          onPick={(k) => {
+            // picking the already-applied design just resumes — re-applying
+            // would wipe the customer's saved tweaks (palette, font, sections)
+            if (cfg.skin !== k) {
+              set.applyTemplate(k);
+              toast(window.TEMPLATES[k].name + " applied — customize away");
+            }
+            setView("builder");
+          }}
+        />
+        <div className={"toast" + (toastMsg ? " show" : "")}><span className="ic">✓</span>{toastMsg}</div>
+      </>
+    );
+  }
+
   return (
     <div className="app">
       <TopBar cfg={cfg} set={set}
         canUndo={hist.past.length > 0} canRedo={hist.future.length > 0}
         onUndo={undo} onRedo={redo}
         onReset={() => { reset(); toast("Reset to defaults · press Undo to restore"); }}
-        onReadyMade={() => setModal("readymade")} onExport={() => setModal("export")} onSubmit={() => setModal("submit")} />
+        onReadyMade={() => { setVisited(true); setView("gallery"); }} onExport={() => setModal("export")} onSubmit={() => setModal("submit")} />
       <div className="body">
         {receiptMode ? <ReceiptLayers cfg={cfg} set={set} /> : <LeftPanel cfg={cfg} set={set} />}
 
@@ -140,7 +166,6 @@ function App() {
         {receiptMode ? <ReceiptInspector cfg={cfg} set={set} /> : <Inspector cfg={cfg} set={set} />}
       </div>
 
-      {modal === "readymade" && <ReadyMadeModal cfg={cfg} set={set} onClose={() => setModal(null)} toast={toast} />}
       {(modal === "submit" || modal === "export") && <ReviewModal cfg={cfg} mode={modal} onClose={() => setModal(null)} toast={toast} />}
 
       <div className={"toast" + (toastMsg ? " show" : "")}>
