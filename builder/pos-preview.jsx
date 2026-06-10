@@ -127,11 +127,11 @@ function Splitter({ axis, scale, value, def, min, max, sign, onChange }) {
   );
 }
 
-function Cart({ cfg, layout, width }) {
+function Cart({ cfg, layout, width, height }) {
   const showNotes = cfg.sections.notes;
   const bottom = layout === "bottom";
   return (
-    <div className={"pos-cart" + (bottom ? " bottom" : "")} style={bottom ? undefined : { width }}>
+    <div className={"pos-cart" + (bottom ? " bottom" : "")} style={bottom ? (height ? { height, flex: "none" } : undefined) : { width }}>
       {!bottom && <div className="ch">Current order · Table 4</div>}
       <div className="pos-items">
         <div className="pos-line"><span className="q">2</span><span className="lnm">Cappuccino</span><span className="lpr">₱260</span></div>
@@ -145,7 +145,7 @@ function Cart({ cfg, layout, width }) {
   );
 }
 
-function Zone({ id, picked, pickMode, onPick, tag, children, style }) {
+function Zone({ id, picked, pickMode, onPick, tag, children, style, grip, gripTitle }) {
   return (
     <div
       data-zone={id}
@@ -154,6 +154,14 @@ function Zone({ id, picked, pickMode, onPick, tag, children, style }) {
       onClick={pickMode ? (e) => { e.stopPropagation(); onPick(id); } : undefined}
     >
       {picked && <span className="zone-tag">{tag}</span>}
+      {pickMode && grip && (
+        <span
+          className="zone-grip"
+          title={gripTitle || "Drag to move"}
+          onPointerDown={grip}
+          onClick={(e) => e.stopPropagation()}
+        >⠿</span>
+      )}
       {children}
     </div>
   );
@@ -567,18 +575,109 @@ function SkinStage({ cfg, compact }) {
   );
 }
 
+const STACK_ROWS = ["header", "search", "tabs", "main", "pay"];
+
 function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
-  if (cfg.skin && SKINS[cfg.skin]) {
-    return <SkinStage cfg={cfg} compact={compact} />;
-  }
   const pal = window.resolvePalette(cfg);
   const dev = window.DEVICES[cfg.device];
   const preset = window.PRESETS[cfg.preset];
   const font = window.FONTS[cfg.font] || window.FONTS.inter;
+  // all hooks run before the skin early-return so the hook count never changes
+  // when the user switches between a ready-made skin and the classic preview
   const [ref, scale] = useFit(dev.w, dev.h, compact ? 24 : 40);
   const S = cfg.sections;
   const phone = dev.portrait;
   const resizable = pickMode && typeof onResize === "function";
+
+  // ---- drag state: row reordering + cart docking ----
+  const stackRef = useRef(null);
+  const [rowDrag, setRowDrag] = useState(null);   // { id, over } — over = visible slot index
+  const rowDragRef = useRef(null);
+  const [cartDock, setCartDock] = useState(null); // { dock } while dragging the cart
+  const cartDockRef = useRef(null);
+
+  if (cfg.skin && SKINS[cfg.skin]) {
+    return <SkinStage cfg={cfg} compact={compact} />;
+  }
+
+  // saved order, tolerant of older configs / future rows
+  const saved = Array.isArray(cfg.stackOrder) ? cfg.stackOrder : STACK_ROWS;
+  const stackOrder = [
+    ...saved.filter((id) => STACK_ROWS.includes(id)),
+    ...STACK_ROWS.filter((id) => !saved.includes(id)),
+  ];
+
+  const startRowDrag = (id) => (e) => {
+    if (!resizable) return;
+    e.preventDefault(); e.stopPropagation();
+    const move = (ev) => {
+      const stack = stackRef.current;
+      if (!stack) return;
+      const slots = Array.from(stack.children).filter((el) => el.hasAttribute("data-row"));
+      let over = slots.length;
+      for (let i = 0; i < slots.length; i++) {
+        const r = slots[i].getBoundingClientRect();
+        if (ev.clientY < r.top + r.height / 2) { over = i; break; }
+      }
+      rowDragRef.current = { id, over };
+      setRowDrag({ id, over });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      document.body.style.cursor = "";
+      const d = rowDragRef.current;
+      if (d && d.over != null) {
+        // map the visible slot index back into the full stack order
+        const vis = stackOrder.filter((rid) => rowVisible[rid]);
+        const from = vis.indexOf(d.id);
+        let at = Math.min(d.over, vis.length);
+        if (from >= 0 && from < at) at -= 1;
+        const without = vis.filter((rid) => rid !== d.id);
+        const newVis = [...without.slice(0, at), d.id, ...without.slice(at)];
+        const visSet = new Set(vis);
+        let vi = 0;
+        const next = stackOrder.map((rid) => (visSet.has(rid) ? newVis[vi++] : rid));
+        if (next.join() !== stackOrder.join()) onResize({ stackOrder: next });
+      }
+      rowDragRef.current = null;
+      setRowDrag(null);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    document.body.style.cursor = "grabbing";
+    rowDragRef.current = { id, over: null };
+    setRowDrag({ id, over: null });
+  };
+
+  const startCartDrag = (e) => {
+    if (!resizable) return;
+    e.preventDefault(); e.stopPropagation();
+    const move = (ev) => {
+      const stack = stackRef.current;
+      if (!stack) return;
+      const r = stack.getBoundingClientRect();
+      const x = (ev.clientX - r.left) / r.width;
+      const y = (ev.clientY - r.top) / r.height;
+      const dock = y > 0.72 ? "bottom" : x < 0.42 ? "left" : x > 0.58 ? "right" : null;
+      cartDockRef.current = dock;
+      setCartDock({ dock });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      document.body.style.cursor = "";
+      const dock = cartDockRef.current;
+      if (dock && dock !== cfg.cart) onResize({ cart: dock, selected: "cart" });
+      cartDockRef.current = null;
+      setCartDock(null);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    document.body.style.cursor = "grabbing";
+    cartDockRef.current = null;
+    setCartDock({ dock: null });
+  };
 
   const cartPos = cfg.cart; // right | left | bottom | none
   const cartW = cfg.cartW ?? 240;
@@ -601,10 +700,13 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
   );
 
   const cartSide = !(cartPos === "bottom" || phone);
+  const cartH = cfg.cartH ?? 150;
   const cart = S.cart && cartPos !== "none" && (
     <Zone id="cart" picked={cfg.selected === "cart"} pickMode={pickMode} onPick={onPick} tag="order cart"
-      style={ cartSide ? { flex: "none", display: "flex" } : { flex: "none" } }>
-      <Cart cfg={cfg} layout={cartSide ? "side" : "bottom"} width={cartW} />
+      style={ cartSide ? { flex: "none", display: "flex" } : { flex: "none" } }
+      grip={!phone ? startCartDrag : null} gripTitle="Drag to dock left · right · bottom">
+      <Cart cfg={cfg} layout={cartSide ? "side" : "bottom"} width={cartW}
+        height={!cartSide && !phone ? cartH : undefined} />
     </Zone>
   );
 
@@ -625,6 +727,10 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
     <Splitter axis="x" scale={scale} value={cartW} def={240} min={170} max={Math.round(dev.w * 0.6)}
       sign={dir === "left" ? 1 : -1} onChange={(v) => onResize({ cartW: v })} />
   );
+  const cartHSplit = resizable && cart && cartPos === "bottom" && !phone && (
+    <Splitter axis="y" scale={scale} value={cartH} def={150} min={104} max={Math.round(dev.h * 0.45)}
+      sign={-1} onChange={(v) => onResize({ cartH: v })} />
+  );
 
   // main arrangement
   let mainClass = "pos-main";
@@ -634,75 +740,103 @@ function POSPreview({ cfg, pickMode, onPick, compact, onResize }) {
     mainKids = <>{menu}{cart}</>;
   } else if (cartPos === "bottom") {
     mainClass += " bottom";
-    mainKids = <>{rail ? <div style={{ display: "flex", gap: 14, flex: 1, minHeight: 0 }}>{rail}{railSplit}{menu}</div> : menu}{cart}</>;
+    mainKids = <>{rail ? <div style={{ display: "flex", gap: 14, flex: 1, minHeight: 0 }}>{rail}{railSplit}{menu}</div> : menu}{cartHSplit}{cart}</>;
   } else if (cartPos === "left") {
     mainKids = <>{cart}{cartSplit("left")}{rail}{railSplit}{menu}</>;
   } else {
     mainKids = <>{rail}{railSplit}{menu}{cartSplit("right")}{cart}</>;
   }
 
+  // every stack row, keyed — rendered in cfg.stackOrder, draggable via grips
+  const rowEls = {
+    header: (
+      <Zone id="header" picked={cfg.selected === "header"} pickMode={pickMode} onPick={onPick} tag="header"
+        grip={startRowDrag("header")} gripTitle="Drag up · down to reorder">
+        <div className="pos-header">
+          {(() => {
+            const b = Math.max(30, Math.min(56, Math.round((cfg.logoSize ?? 46) * 0.82)));
+            return (
+              <div className={"pos-logo" + (cfg.logo ? " has-img" : "")}
+                style={cfg.logo ? { width: b, height: b, background: "transparent" } : undefined}>
+                {cfg.logo
+                  ? <img src={cfg.logo} alt="logo" style={{ width: b, height: b, objectFit: "contain", borderRadius: "inherit", display: "block" }} />
+                  : (cfg.initials || "·")}
+              </div>
+            );
+          })()}
+          <div className="pos-brand">{cfg.business || "Your Business"}
+            <small>// powered by kape.dev</small></div>
+          <div className="pos-headright">
+            <span className="pos-clock">09:41 AM</span>
+            <span className="pos-avatar" />
+          </div>
+        </div>
+      </Zone>
+    ),
+    search: S.search && (
+      <Zone id="search" picked={cfg.selected === "search"} pickMode={pickMode} onPick={onPick} tag="search bar"
+        grip={startRowDrag("search")} gripTitle="Drag up · down to reorder">
+        <div className="pos-search">
+          <span className="pos-search-ic">⌕</span>
+          <span className="pos-search-ph">Search the menu…</span>
+        </div>
+      </Zone>
+    ),
+    tabs: S.tabs && (
+      <Zone id="tabs" picked={cfg.selected === "tabs"} pickMode={pickMode} onPick={onPick} tag="category tabs"
+        grip={startRowDrag("tabs")} gripTitle="Drag up · down to reorder">
+        <div className="pos-tabs">
+          {cfg.tabs.map((t, i) => (
+            <div className={"pos-tab" + (i === 0 ? " on" : "")} key={t + i}>{t}</div>
+          ))}
+        </div>
+      </Zone>
+    ),
+    main: <div className={mainClass}>{mainKids}</div>,
+    pay: S.pay && cartPos === "none" && (
+      <Zone id="pay" picked={cfg.selected === "pay"} pickMode={pickMode} onPick={onPick} tag="quick-pay bar"
+        grip={startRowDrag("pay")} gripTitle="Drag up · down to reorder">
+        <div style={{ padding: "12px 18px", borderTop: "1px solid var(--pos-line)", background: "var(--pos-surface)", display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--pos-sub)" }}>3 items</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 17, marginLeft: "auto", color: "var(--pos-text)" }}>₱505</span>
+          <div className="pos-pay" style={{ padding: "10px 22px" }}>Charge</div>
+        </div>
+      </Zone>
+    ),
+  };
+  const rowVisible = {};
+  STACK_ROWS.forEach((id) => { rowVisible[id] = !!rowEls[id]; });
+  const renderedIds = stackOrder.filter((id) => rowVisible[id]);
+
   return (
     <div className="canvas-stage" ref={ref} style={compact ? { padding: 10, width: "100%", height: "100%" } : undefined} onClick={pickMode ? () => onPick(null) : undefined}>
       <div className="pos-frame" style={{ width: dev.w * scale, height: dev.h * scale }}>
         <div className="pos-scaler" style={{ width: dev.w, height: dev.h, transform: `scale(${scale})` }}>
           <div className={"pos-bezel" + (phone ? " portrait" : "")} />
-        <div className="pos" style={posVars}>
-          {/* header */}
-          <Zone id="header" picked={cfg.selected === "header"} pickMode={pickMode} onPick={onPick} tag="header" style={{ flex: "none" }}>
-            <div className="pos-header">
-              {(() => {
-                const b = Math.max(30, Math.min(56, Math.round((cfg.logoSize ?? 46) * 0.82)));
-                return (
-                  <div className={"pos-logo" + (cfg.logo ? " has-img" : "")}
-                    style={cfg.logo ? { width: b, height: b, background: "transparent" } : undefined}>
-                    {cfg.logo
-                      ? <img src={cfg.logo} alt="logo" style={{ width: b, height: b, objectFit: "contain", borderRadius: "inherit", display: "block" }} />
-                      : (cfg.initials || "·")}
-                  </div>
-                );
-              })()}
-              <div className="pos-brand">{cfg.business || "Your Business"}
-                <small>// powered by kape.dev</small></div>
-              <div className="pos-headright">
-                <span className="pos-clock">09:41 AM</span>
-                <span className="pos-avatar" />
-              </div>
+        <div className="pos" style={posVars} ref={stackRef}>
+          {renderedIds.map((id, i) => (
+            <div
+              key={id}
+              data-row={id}
+              className={
+                "pos-slot" +
+                (rowDrag && rowDrag.id === id ? " dragging" : "") +
+                (rowDrag && rowDrag.over === i ? " over" : "")
+              }
+              style={id === "main" ? { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } : { flex: "none" }}
+            >
+              {rowEls[id]}
             </div>
-          </Zone>
+          ))}
+          {rowDrag && rowDrag.over === renderedIds.length && <div className="pos-drop-end" />}
 
-          {/* search */}
-          {S.search && (
-            <Zone id="search" picked={cfg.selected === "search"} pickMode={pickMode} onPick={onPick} tag="search bar" style={{ flex: "none" }}>
-              <div className="pos-search">
-                <span className="pos-search-ic">⌕</span>
-                <span className="pos-search-ph">Search the menu…</span>
-              </div>
-            </Zone>
-          )}
-
-          {/* tabs */}
-          {S.tabs && (
-            <Zone id="tabs" picked={cfg.selected === "tabs"} pickMode={pickMode} onPick={onPick} tag="category tabs" style={{ flex: "none" }}>
-              <div className="pos-tabs">
-                {cfg.tabs.map((t, i) => (
-                  <div className={"pos-tab" + (i === 0 ? " on" : "")} key={t + i}>{t}</div>
-                ))}
-              </div>
-            </Zone>
-          )}
-
-          {/* main */}
-          <div className={mainClass}>{mainKids}</div>
-
-          {/* quick pay bar */}
-          {S.pay && cartPos === "none" && (
-            <Zone id="pay" picked={cfg.selected === "pay"} pickMode={pickMode} onPick={onPick} tag="quick-pay bar" style={{ flex: "none" }}>
-              <div style={{ padding: "12px 18px", borderTop: "1px solid var(--pos-line)", background: "var(--pos-surface)", display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--pos-sub)" }}>3 items</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 17, marginLeft: "auto", color: "var(--pos-text)" }}>₱505</span>
-                <div className="pos-pay" style={{ padding: "10px 22px" }}>Charge</div>
-              </div>
-            </Zone>
+          {/* dock hints while dragging the cart */}
+          {cartDock && (
+            <div className="pos-docks">
+              <div className={"pos-dock left" + (cartDock.dock === "left" ? " on" : "")}><span>⟵ dock left</span></div>
+              <div className={"pos-dock right" + (cartDock.dock === "right" ? " on" : "")}><span>dock right ⟶</span></div>
+              <div className={"pos-dock bottom" + (cartDock.dock === "bottom" ? " on" : "")}><span>dock bottom ⟱</span></div>
+            </div>
           )}
         </div>
         </div>

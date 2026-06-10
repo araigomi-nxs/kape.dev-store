@@ -216,7 +216,9 @@ const DEFAULT_CONFIG = {
   menuCols: 3,
   menuLayout: "grid", // grid | list | compact
   cartW: 240,      // resizable order-cart width (device px)
+  cartH: 150,      // resizable bottom-cart height (device px)
   railW: 118,      // resizable category-rail width (device px)
+  stackOrder: ["header", "search", "tabs", "main", "pay"], // drag-to-reorder rows
   radiusPanel: 14, // corner radius — cart & rail panels
   radiusCard: 12,  // corner radius — menu item cards
   radiusButton: 11,// corner radius — pay / tab / logo buttons
