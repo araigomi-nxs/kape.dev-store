@@ -304,7 +304,7 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 .pos-total{display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--pos-line);}
 .pos-total .lbl{font-weight:600;font-size:13px;}
 .pos-total .amt{font-family:var(--font-mono);font-weight:600;font-size:18px;}
-.pos-pay{background:var(--pos-accent);color:var(--pos-on-accent,#fff);border-radius:var(--pos-r-btn,11px);padding:13px;text-align:center;font-weight:700;font-size:14.5px;}
+.pos-pay{background:var(--pos-accent-grad,var(--pos-accent));color:var(--pos-on-accent,#fff);border-radius:var(--pos-r-btn,11px);padding:13px;text-align:center;font-weight:700;font-size:14.5px;}
 .pos-cart.bottom .pos-pay{padding:13px 28px;white-space:nowrap;}
 .pos-cart.bottom .pos-items{flex-direction:row;overflow:auto;}
 
@@ -566,7 +566,7 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 .gl-badge.new{background:#dde8fb;color:#3d6bc0;}
 
 /* floating add */
-.gl-fab{position:absolute;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;background:var(--gl-accent);
+.gl-fab{position:absolute;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;background:var(--gl-accent-grad,var(--gl-accent));
   color:var(--gl-on-accent);display:grid;place-items:center;font-size:24px;font-weight:500;line-height:1;
   box-shadow:0 12px 24px -8px var(--gl-accent);}
 
@@ -593,7 +593,7 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 .gl-trow span:last-child{color:var(--gl-text);font-weight:600;}
 .gl-trow.tot{font-size:16px;font-weight:700;color:var(--gl-text);padding-top:10px;border-top:1px solid var(--gl-line);}
 .gl-trow.tot span:last-child{color:var(--gl-accent);}
-.gl-checkout{background:var(--gl-accent);color:var(--gl-on-accent);border-radius:var(--gl-r-btn,12px);padding:13px;text-align:center;
+.gl-checkout{background:var(--gl-accent-grad,var(--gl-accent));color:var(--gl-on-accent);border-radius:var(--gl-r-btn,12px);padding:13px;text-align:center;
   font-size:13.5px;font-weight:700;}
 
 /* ===== Console ready-made skin (dark · mono · developer console) ===== */
@@ -667,7 +667,7 @@ textarea.inp{resize:none;min-height:74px;line-height:1.5;}
 .cn-actions{display:flex;gap:9px;}
 .cn-void{flex:1;text-align:center;padding:12px;border-radius:var(--cn-r-btn,8px);border:1px solid var(--cn-line);background:transparent;
   font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--cn-sub);}
-.cn-exec{flex:1.5;text-align:center;padding:12px;border-radius:var(--cn-r-btn,8px);background:var(--cn-accent);color:var(--cn-on-accent);
+.cn-exec{flex:1.5;text-align:center;padding:12px;border-radius:var(--cn-r-btn,8px);background:var(--cn-accent-grad,var(--cn-accent));color:var(--cn-on-accent);
   font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:6px;}
 
 /* ===== Ready-made skins · responsive (tablet + mobile) ===== */

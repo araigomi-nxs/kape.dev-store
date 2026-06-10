@@ -4,10 +4,15 @@ const PALETTES = {
   // Light themes
   coffee:   { name: "Coffee",   dark: false, accent: "#b9743b", bg: "#f4ede2", surface: "#fffaf3", text: "#2a2018", sub: "#8a7a66", line: "#e6dccb" },
   forest:   { name: "Forest",   dark: false, accent: "#3f7155", bg: "#eef2ec", surface: "#ffffff", text: "#1f2a23", sub: "#6f8076", line: "#dbe3d8" },
-  navy:     { name: "Navy",     dark: false, accent: "#34507a", bg: "#eceef3", surface: "#ffffff", text: "#1c2430", sub: "#73809a", line: "#d8dde7" },
   wine:     { name: "Wine",     dark: false, accent: "#8a3b4b", bg: "#f4eded", surface: "#fffafa", text: "#2c1c20", sub: "#937076", line: "#e7d6d8" },
   charcoal: { name: "Charcoal", dark: false, accent: "#3a3531", bg: "#eeecea", surface: "#ffffff", text: "#1f1c19", sub: "#807a73", line: "#ded9d4" },
   olive:    { name: "Olive",    dark: false, accent: "#8b8646", bg: "#ece6d1", surface: "#f6f1e1", text: "#2d2c22", sub: "#8c8768", line: "#ddd6bd" },
+  // Gradient themes
+  sunset:   { name: "Sunset",   group: "gradient", dark: false, accent: "#f97316", grad: "linear-gradient(135deg,#fb923c,#f43f5e)", bg: "#fdf4ed", surface: "#fffdfb", text: "#1c1410", sub: "#9a7860", line: "#f3e3d4" },
+  ocean:    { name: "Ocean",    group: "gradient", dark: false, accent: "#0ea5e9", grad: "linear-gradient(135deg,#22d3ee,#3b82f6)", bg: "#eef6fb", surface: "#fbfdff", text: "#0f1d28", sub: "#6b8597", line: "#d6e6f0" },
+  lavender: { name: "Lavender", group: "gradient", dark: false, accent: "#8b5cf6", grad: "linear-gradient(135deg,#a855f7,#6366f1)", bg: "#f3f0fc", surface: "#fdfcff", text: "#1b1530", sub: "#82789e", line: "#e6def4" },
+  peach:    { name: "Peach",    group: "gradient", dark: false, accent: "#fb7185", grad: "linear-gradient(135deg,#fda4af,#f97316)", bg: "#fdeff1", surface: "#fffbfc", text: "#2a161b", sub: "#a37782", line: "#f6dde2" },
+  mint:     { name: "Mint",     group: "gradient", dark: false, accent: "#10b981", grad: "linear-gradient(135deg,#34d399,#06b6d4)", bg: "#eaf7f1", surface: "#fafdfb", text: "#0d2219", sub: "#6b9488", line: "#d3ece0" },
   // Dark themes
   noir:     { name: "Noir",     dark: true,  accent: "#c8a97e", bg: "#141414", surface: "#1f1f1f", text: "#ededed", sub: "#8f8f8f", line: "#2e2e2e" },
   midnight: { name: "Midnight", dark: true,  accent: "#5b8fd6", bg: "#0e1422", surface: "#182030", text: "#e6ecf6", sub: "#8a98b2", line: "#27324a" },
